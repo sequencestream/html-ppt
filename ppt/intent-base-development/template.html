@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>意图驱动开发 — Intent-Based Development</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="deck-stage.js"></script>
+<style>
+  :root{
+    --cream:#EFE9D9;
+    --cream-2:#E4DCC4;
+    --green:#1F8A4C;
+    --green-dark:#136636;
+    --pink:#F06CA8;
+    --pink-dark:#D14E8B;
+    --orange:#E85A1F;
+    --yellow:#F5C518;
+    --ink:#0F0F0F;
+    --ink-2:#2A2A2A;
+    --rule:#0F0F0F;
+    --font-display:"Archivo Black","Noto Serif SC",sans-serif;
+    --font-body:"Space Grotesk","Noto Serif SC",sans-serif;
+    --font-mono:"JetBrains Mono",monospace;
+  }
+  html, body { margin:0; padding:0; background:#000; }
+  body { font-family:var(--font-body); color:var(--ink); }
+
+  deck-stage > section{
+    width:1920px; height:1080px;
+    background:var(--cream);
+    color:var(--ink);
+    position:relative;
+    overflow:hidden;
+    box-sizing:border-box;
+  }
+
+  /* shared */
+  .display { font-family:var(--font-display); line-height:1.0; }
+  .mono { font-family:var(--font-mono); }
+  .body { font-family:var(--font-body); }
+
+  .slide-meta{
+    position:absolute; left:64px; right:64px; bottom:40px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-mono); font-size:24px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--ink);
+  }
+  .slide-meta .dot{ width:10px; height:10px; background:var(--ink); border-radius:50%; display:inline-block; margin:0 14px; transform:translateY(-2px); }
+
+  .topbar{
+    position:absolute; left:64px; right:64px; top:48px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--font-mono); font-size:24px; letter-spacing:.08em; text-transform:uppercase;
+  }
+  .topbar .pill{
+    border:2px solid var(--ink); padding:6px 14px; border-radius:999px;
+  }
+
+  /* --- SLIDE 1: TITLE / POSTER --- */
+  .s1 .title{
+    position:absolute; left:96px; top:50%; transform:translateY(-50%);
+    font-size:180px; color:var(--ink); width:900px;
+  }
+  .s1 .title .row{ display:block; }
+  .s1 .poster{
+    position:absolute; right:96px; top:140px; bottom:140px;
+    width:760px;
+    background:var(--green);
+    border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s1 .poster .switch{
+    position:relative; width:380px; height:380px;
+    background:var(--pink); border:4px solid var(--ink);
+    box-shadow: 24px 24px 0 var(--orange), 24px 24px 0 4px var(--ink);
+  }
+  .s1 .poster .switch .lever{
+    position:absolute; top:64px; left:64px; width:240px; height:170px;
+    background:#FBD0E3; border:4px solid var(--ink);
+    transform: skewY(-8deg);
+  }
+  .s1 .poster .switch .lever:after{
+    content:""; position:absolute; left:0; right:0; bottom:-30px; height:30px;
+    background:var(--pink-dark); border:4px solid var(--ink); border-top:0;
+  }
+  .s1 .poster .switch .label-on{
+    position:absolute; top:78px; right:60px; font-family:"Archivo Black"; font-size:32px; color:var(--ink);
+  }
+  .s1 .poster .switch .label-off{
+    position:absolute; bottom:48px; left:0; right:0; text-align:center;
+    font-family:"Archivo Black"; font-size:32px; color:var(--ink);
+  }
+  .s1 .tagline{
+    position:absolute; left:96px; top:150px;
+    font-family:var(--font-mono); font-size:24px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--ink);
+  }
+  .s1 .tagline span{ display:inline-block; width:60px; height:3px; background:var(--ink); vertical-align:middle; margin-right:18px; transform:translateY(-3px);}
+  .s1 .footnote{
+    position:absolute; left:96px; bottom:150px;
+    font-family:var(--font-body); font-size:26px; color:var(--ink-2); max-width:760px; line-height:1.5;
+  }
+
+  /* --- SLIDE 2 / 4-STYLE: SECTION INTRO / TWO COL --- */
+  .s2 .kicker{
+    position:absolute; left:96px; top:200px;
+    font-family:var(--font-body); font-weight:700; font-size:26px; letter-spacing:.02em;
+    background:var(--ink); color:var(--cream); padding:8px 18px; display:inline-block; white-space:nowrap;
+  }
+  .s2 .h{
+    position:absolute; left:96px; top:300px; right:1000px;
+    font-size:150px; line-height:1.02; color:var(--ink);
+  }
+  .s2 .body-col{
+    position:absolute; left:1020px; top:300px; right:520px;
+    font-size:28px; line-height:1.55; color:var(--ink-2);
+  }
+  .s2 .body-col p + p { margin-top:26px; }
+  .s2 .body-col p:first-child{ margin-top:0; }
+  .s2 .body-col strong{ color:var(--ink); }
+  .s2 .marker{
+    position:absolute; left:96px; bottom:170px;
+    min-width:520px; height:120px; padding:0 40px; background:var(--pink); border:4px solid var(--ink);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:52px;
+  }
+  .s2 .marker:after{
+    content:""; position:absolute; right:-24px; bottom:-24px; width:100%; height:100%;
+    background:var(--orange); border:4px solid var(--ink); z-index:-1;
+  }
+  .s2 .ix{
+    position:absolute; right:96px; top:320px;
+    width:340px; height:340px; background:var(--green); border:4px solid var(--ink);
+  }
+  .s2 .ix .circ{
+    position:absolute; left:50%; top:50%; width:180px; height:180px;
+    background:var(--yellow); border:4px solid var(--ink); border-radius:50%;
+    transform:translate(-50%,-50%);
+  }
+
+  /* --- SLIDE 3: STAT GRID 2x2 --- */
+  .s3 .h{
+    position:absolute; left:96px; top:130px; right:96px;
+    font-size:88px; line-height:1.02; color:var(--ink);
+  }
+  .s3 .grid{
+    position:absolute; left:96px; right:96px; top:400px;
+    display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+    gap:28px; bottom:110px;
+  }
+  .s3 .cell{
+    border:4px solid var(--ink); padding:28px 32px; position:relative; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .s3 .cell .num-wrap{ padding-top:6px; }
+  .s3 .cell .num{ font-family:var(--font-display); font-size:88px; line-height:.95; }
+  .s3 .cell .lbl{ font-family:var(--font-body); font-weight:700; font-size:30px; letter-spacing:.01em; }
+  .s3 .cell .desc{ font-size:24px; line-height:1.5; max-width:640px; color:var(--ink-2); margin-top:8px;}
+  .s3 .c1{ background:var(--green); color:var(--cream); }
+  .s3 .c1 .desc{ color:var(--cream); }
+  .s3 .c2{ background:var(--pink); }
+  .s3 .c3{ background:var(--cream); }
+  .s3 .c4{ background:var(--orange); color:var(--cream);}
+  .s3 .c4 .desc{ color:var(--cream); }
+  .s3 .cell .corner{ position:absolute; top:24px; right:28px; font-family:var(--font-mono); font-size:24px; letter-spacing:.1em; }
+
+  /* --- SLIDE 4 (QUOTE / THESIS) --- */
+  .pq .mark{
+    position:absolute; left:88px; top:150px;
+    font-family:"Archivo Black"; font-size:300px; color:var(--pink); line-height:.7;
+  }
+  .pq .q{
+    position:absolute; left:96px; top:340px; right:320px;
+    font-family:"Noto Serif SC",serif; font-weight:900; font-size:88px; line-height:1.32; color:var(--ink);
+  }
+  .pq .q .hl{ background:var(--yellow); padding:0 6px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+  .pq .rule{ position:absolute; left:96px; bottom:250px; width:140px; height:10px; background:var(--orange); }
+  .pq .sub{
+    position:absolute; left:96px; bottom:150px; right:320px;
+    font-size:30px; line-height:1.5; color:var(--ink-2);
+  }
+  .pq .stamp{
+    position:absolute; right:110px; bottom:150px;
+    width:300px; height:300px; background:var(--green); border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; transform:rotate(-6deg);
+  }
+  .pq .stamp .inner{
+    width:244px; height:244px; border:4px solid var(--cream); border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; color:var(--cream); padding:18px; box-sizing:border-box;
+  }
+  .pq .stamp .inner .big{ font-family:"Archivo Black"; font-size:52px; line-height:.95; }
+  .pq .stamp .inner .sm{ font-family:"Noto Serif SC"; font-weight:700; font-size:22px; margin-top:10px; }
+
+  /* --- TABLES (shared) --- */
+  .tbl{
+    position:absolute; left:96px; right:96px;
+    border:4px solid var(--ink); background:var(--cream-2);
+    display:grid;
+  }
+  .tbl .row{ display:grid; border-bottom:3px solid var(--ink); }
+  .tbl .row:last-child{ border-bottom:0; }
+  .tbl .row > div{
+    padding:16px 26px; border-right:3px solid var(--ink);
+    display:flex; align-items:center; font-size:24px; line-height:1.45;
+  }
+  .tbl .row > div:last-child{ border-right:0; }
+  .tbl .head{ background:var(--ink); }
+  .tbl .head > div{
+    font-family:"Noto Serif SC"; font-weight:900; font-size:28px; color:var(--cream);
+    border-right:3px solid var(--cream);
+  }
+  .tbl .head > div:last-child{ border-right:0; }
+  .tbl .lab{ font-family:"Noto Serif SC"; font-weight:900; font-size:26px; }
+  .tbl .lab .en{ font-family:var(--font-mono); font-weight:400; font-size:18px; letter-spacing:.06em; color:var(--ink-2); display:block; margin-top:4px; }
+  .tbl .head .lab{ color:var(--cream); }
+  .col-pink{ background:var(--pink); }
+  .col-green{ background:var(--green); color:var(--cream); }
+  .col-orange{ background:var(--orange); color:var(--cream); }
+  .col-yellow{ background:var(--yellow); }
+  .col-cream{ background:var(--cream); }
+
+  .h-lg{ position:absolute; left:96px; top:130px; right:500px; font-size:84px; line-height:1.02; color:var(--ink); }
+  .badge{
+    position:absolute; right:120px; top:250px;
+    background:var(--yellow); border:4px solid var(--ink);
+    padding:14px 22px; font-family:"Noto Serif SC"; font-weight:900; font-size:28px;
+    transform:rotate(-4deg);
+  }
+
+  /* --- SLIDE 6: FIVE DIMENSIONS STACK --- */
+  .dims .h{ position:absolute; left:96px; top:120px; right:1010px; font-size:110px; line-height:1.0; color:var(--ink); }
+  .dims .sub{ position:absolute; left:96px; top:470px; right:1060px; font-size:27px; line-height:1.6; color:var(--ink-2); }
+  .dims .tag-note{ position:absolute; left:96px; bottom:150px; font-family:var(--font-mono); font-size:24px; letter-spacing:.06em; color:var(--ink-2); max-width:760px; line-height:1.5; text-transform:none; }
+  .dims .panel{
+    position:absolute; right:80px; top:110px; width:940px; height:860px;
+    background:var(--green); border:4px solid var(--ink);
+  }
+  .dims .barstack{ position:absolute; left:56px; right:56px; top:56px; bottom:56px; display:flex; flex-direction:column; justify-content:space-between; }
+  .dims .dbar{
+    height:128px; border:4px solid var(--ink); box-shadow:14px 14px 0 var(--ink);
+    display:flex; flex-direction:column; justify-content:center; padding:0 28px; box-sizing:border-box;
+  }
+  .dims .dbar .top{ display:flex; align-items:baseline; gap:16px; }
+  .dims .dbar .en{ font-family:"Archivo Black"; font-size:38px; line-height:1; }
+  .dims .dbar .cn{ font-family:"Noto Serif SC"; font-weight:900; font-size:26px; }
+  .dims .dbar .mn{ margin-top:8px; font-size:20px; line-height:1.3; color:var(--ink-2); }
+  .dims .db1{ background:var(--pink); }
+  .dims .db2{ background:var(--yellow); }
+  .dims .db3{ background:var(--orange); color:var(--cream); }
+  .dims .db3 .mn{ color:var(--cream); }
+  .dims .db4{ background:var(--cream); }
+  .dims .db5{ background:var(--cream-2); }
+
+  /* --- SLIDE 7: FIVE-ROW WORKED EXAMPLE --- */
+  .ex5 .h{ position:absolute; left:96px; top:96px; right:600px; font-size:80px; line-height:1.02; color:var(--ink); }
+  .ex5 .kick{ position:absolute; right:96px; top:150px; font-family:"Noto Serif SC"; font-weight:700; font-size:26px; background:var(--ink); color:var(--cream); padding:8px 18px; }
+  .ex5 .list{ position:absolute; left:96px; right:96px; top:290px; bottom:110px; display:flex; flex-direction:column; gap:14px; }
+  .ex5 .r{ display:flex; border:4px solid var(--ink); flex:1; }
+  .ex5 .r .chip{ flex:0 0 340px; display:flex; flex-direction:column; justify-content:center; padding:0 30px; border-right:4px solid var(--ink); }
+  .ex5 .r .chip .en{ font-family:"Archivo Black"; font-size:38px; line-height:1; }
+  .ex5 .r .chip .cn{ font-family:"Noto Serif SC"; font-weight:700; font-size:23px; margin-top:6px; }
+  .ex5 .r .txt{ flex:1; display:flex; align-items:center; padding:16px 34px; }
+  .ex5 .r .txt > div{ font-size:23px; line-height:1.6; }
+  .ex5 .r .txt b{ font-weight:900; }
+  .ex5 .r .txt .no{ color:var(--orange); font-weight:900; }
+  .ex5 .rc1 .chip{ background:var(--green); color:var(--cream); }
+  .ex5 .rc2 .chip{ background:var(--pink); }
+  .ex5 .rc3 .chip{ background:var(--orange); color:var(--cream); }
+  .ex5 .rc4 .chip{ background:var(--yellow); }
+  .ex5 .rc5 .chip{ background:var(--cream-2); }
+
+  /* --- SLIDE 9: SIX FEATURES GRID --- */
+  .feat .h{ position:absolute; left:96px; top:120px; right:96px; font-size:84px; line-height:1.02; color:var(--ink); }
+  .feat .sub{ position:absolute; left:100px; top:250px; right:96px; font-size:27px; line-height:1.5; color:var(--ink-2); }
+  .feat .grid6{ position:absolute; left:96px; right:96px; top:330px; bottom:100px; display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:1fr 1fr; gap:28px; }
+  .feat .cell{ border:4px solid var(--ink); padding:28px 34px; position:relative; display:flex; flex-direction:column; justify-content:center; }
+  .feat .cell .idx{ position:absolute; right:28px; top:22px; font-family:var(--font-mono); font-size:22px; letter-spacing:.08em; }
+  .feat .cell .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:36px; line-height:1.15; padding-right:56px; }
+  .feat .cell .d{ font-size:22px; line-height:1.5; margin-top:12px; }
+  .feat .cell .win{ margin-top:16px; padding-top:14px; border-top:3px solid currentColor; font-size:22px; line-height:1.5; font-weight:700; font-family:"Noto Serif SC"; }
+  .feat .cell .win .arw{ font-family:"Archivo Black"; margin-right:8px; }
+  .feat .f1{ background:var(--green); color:var(--cream); }
+  .feat .f2{ background:var(--pink); }
+  .feat .f3{ background:var(--yellow); }
+  .feat .f4{ background:var(--orange); color:var(--cream); }
+  .feat .f5{ background:var(--cream); }
+  .feat .f6{ background:var(--cream-2); }
+
+  /* --- SLIDE 11: CREATE (SINGLE METHOD) --- */
+  .create .h{ position:absolute; left:96px; top:96px; right:96px; font-size:84px; line-height:1.02; color:var(--ink); }
+  .create .cols{ position:absolute; left:96px; right:96px; top:300px; bottom:170px; display:grid; grid-template-columns:0.82fr 1.18fr; gap:34px; }
+  .create .panel{ border:4px solid var(--ink); position:relative; display:flex; flex-direction:column; }
+  .create .p-a{ background:var(--green); color:var(--cream); padding:40px 44px; justify-content:space-between; }
+  .create .p-a .tag{ font-family:var(--font-mono); font-size:22px; letter-spacing:.1em; text-transform:uppercase; }
+  .create .p-a .pt{ font-family:"Noto Serif SC"; font-weight:900; font-size:56px; margin-top:16px; line-height:1.12; }
+  .create .p-a .lead{ font-size:25px; line-height:1.6; margin-top:24px; }
+  .create .p-a .lead b{ font-weight:700; color:var(--yellow); }
+  .create .p-a .bulb{ position:absolute; right:40px; bottom:36px; font-size:120px; line-height:1; }
+  .create .p-steps{ background:var(--cream); padding:20px 44px; display:flex; flex-direction:column; justify-content:space-between; }
+  .create .p-steps .st{ display:flex; gap:28px; align-items:flex-start; padding:20px 0; border-bottom:3px solid rgba(15,15,15,.14); }
+  .create .p-steps .st:last-child{ border-bottom:0; }
+  .create .p-steps .st .sn{ font-family:"Archivo Black"; font-size:58px; line-height:.85; flex:0 0 96px; }
+  .create .p-steps .st .sc .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:32px; line-height:1.1; }
+  .create .p-steps .st .sc .d{ font-size:23px; line-height:1.5; margin-top:8px; color:var(--ink-2); }
+  .create .p-steps .st .sc .d b{ font-weight:900; color:var(--ink); }
+  .create .p-steps .s1 .sn{ color:var(--green); }
+  .create .p-steps .s2 .sn{ color:var(--pink-dark); }
+  .create .p-steps .s3 .sn{ color:var(--orange); }
+  .create .p-steps .s4 .sn{ color:var(--green); }
+  .create .foot{ position:absolute; left:96px; right:96px; bottom:96px; font-family:"Noto Serif SC"; font-weight:700; font-size:26px; color:var(--ink); }
+  .create .foot .hl{ background:var(--yellow); padding:2px 8px; }
+
+  /* --- SLIDE 12: DEV PIPELINE (3-STEP FLOW) --- */
+  .dev .h{ position:absolute; left:96px; top:96px; right:96px; font-size:84px; line-height:1.02; color:var(--ink); }
+  .dev .flow{ position:absolute; left:96px; right:96px; top:300px; display:grid; grid-template-columns:repeat(3,1fr); gap:30px; }
+  .dev .step{ border:4px solid var(--ink); padding:34px 38px; height:340px; position:relative; display:flex; flex-direction:column; }
+  .dev .step .n{ font-family:"Archivo Black"; font-size:96px; line-height:.85; }
+  .dev .step .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:40px; margin-top:16px; line-height:1.15; }
+  .dev .step .d{ font-size:25px; line-height:1.55; margin-top:16px; color:var(--ink-2); }
+  .dev .step .arrow{ position:absolute; right:-24px; top:50%; transform:translateY(-50%); width:0; height:0; border-top:18px solid transparent; border-bottom:18px solid transparent; border-left:26px solid var(--ink); z-index:2; }
+  .dev .step:last-child .arrow{ display:none; }
+  .dev .d1{ background:var(--cream); }
+  .dev .d2{ background:var(--orange); color:var(--cream); } .dev .d2 .d{ color:var(--cream); }
+  .dev .d3{ background:var(--green); color:var(--cream); }  .dev .d3 .d{ color:var(--cream); }
+  .dev .notes{ position:absolute; left:96px; right:96px; top:700px; bottom:110px; display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+  .dev .callout{ border:4px solid var(--ink); padding:26px 34px; font-family:"Noto Serif SC"; font-size:24px; line-height:1.55; display:flex; flex-direction:column; justify-content:center; }
+  .dev .callout .lab{ font-family:var(--font-mono); font-weight:400; font-size:22px; letter-spacing:.06em; text-transform:uppercase; display:block; margin-bottom:10px; }
+  .dev .callout b{ font-weight:900; }
+  .dev .c-sdd{ background:var(--cream-2); border-style:dashed; }
+  .dev .c-auto{ background:var(--yellow); }
+
+  /* --- SLIDE 13: CLOSING / BIG MARK --- */
+  .s8{ background:var(--green) !important; color:var(--cream); }
+  .s8 .topbar, .s8 .slide-meta{ color:var(--cream); }
+  .s8 .topbar .pill{ border-color:var(--cream); }
+  .s8 .slide-meta .dot{ background:var(--cream); }
+  .s8 .h{
+    position:absolute; left:96px; top:230px; right:680px;
+    font-size:190px; line-height:1.0; color:var(--cream);
+  }
+  .s8 .strap{
+    position:absolute; left:96px; top:720px; right:640px;
+    font-size:32px; line-height:1.55;
+  }
+  .s8 .strap .hl{ background:var(--yellow); color:var(--ink); padding:2px 8px; }
+  .s8 .stamp{
+    position:absolute; right:120px; bottom:160px;
+    width:340px; height:340px; background:var(--pink);
+    border:4px solid var(--cream);
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-6deg);
+  }
+  .s8 .stamp .inner{
+    width:280px; height:280px; border:4px solid var(--cream); border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:20px; box-sizing:border-box;
+  }
+  .s8 .stamp .num{ font-family:"Archivo Black"; font-size:72px; line-height:.9; margin-bottom:6px; }
+  .s8 .stamp .lbl{ font-family:"Noto Serif SC"; font-weight:700; font-size:24px; letter-spacing:.02em; margin-top:8px;}
+
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- ============ 1: TITLE / POSTER ============ -->
+  <section class="s1" data-screen-label="01 Title">
+    <div class="tagline">
+      <span></span>c3 入门指南 &nbsp;/&nbsp; INTENT-BASED DEVELOPMENT
+    </div>
+
+    <div class="title display">
+      <span class="row">意图驱动</span>
+      <span class="row" style="color:var(--orange)">开发</span>
+    </div>
+
+    <div class="footnote">
+      AI 执行、人把关的新分工 —— 意图不是换个名字的需求，而是写给「人机协作系统」的可执行契约。
+    </div>
+
+    <div class="poster" aria-hidden="true">
+      <div class="switch">
+        <div class="lever"></div>
+        <div class="label-on">ON</div>
+        <div class="label-off">OFF</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · GET STARTED</div>
+      <div>01<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 2: INTRO ============ -->
+  <section class="s2" data-screen-label="02 Intro">
+    <div class="topbar">
+      <div>PART ONE</div>
+      <div class="pill">OVERVIEW</div>
+    </div>
+
+    <div class="kicker">从需求到意图</div>
+    <h1 class="h display">执行不再<br/>是瓶颈</h1>
+
+    <div class="body-col body">
+      <p>AI 智能体可以直接从一段自然语言出发，去阅读代码、规划方案、修改文件、运行测试。<strong>执行不再是瓶颈。</strong></p>
+      <p>真正的瓶颈变成了 ——「你到底想要什么」，能否被<strong>精确、完整、可验证</strong>地表达出来。</p>
+      <p>这就是「意图（Intent）」登场的原因：一个为「AI 执行、人把关」这一新分工而设计的表达单元。</p>
+    </div>
+
+    <div class="marker display">需求 → 意图</div>
+    <div class="ix" aria-hidden="true"><div class="circ"></div></div>
+
+    <div class="slide-meta">
+      <div>WHY INTENT</div>
+      <div>02<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 3: STAT GRID — FOUR PROBLEMS ============ -->
+  <section class="s3" data-screen-label="03 Old Way">
+    <div class="topbar">
+      <div>THE OLD WAY</div>
+      <div class="pill">REQUIREMENTS</div>
+    </div>
+
+    <h1 class="h display">传统需求的四个顽疾</h1>
+
+    <div class="grid">
+      <div class="cell c1">
+        <div class="corner mono">/01</div>
+        <div class="num-wrap"><div class="num">丢失 Why</div></div>
+        <div>
+          <div class="lbl">只说「做什么」</div>
+          <div class="desc">需求是一份功能清单，丢失了背后的「为什么」。开发者拿到的是结论，遇到边界情况只能靠猜或反复追问。</div>
+        </div>
+      </div>
+      <div class="cell c2">
+        <div class="corner mono">/02</div>
+        <div class="num-wrap"><div class="num">拆完静止</div></div>
+        <div>
+          <div class="lbl">粒度靠人拆</div>
+          <div class="desc">史诗→特性→故事→任务层层人工拆解，拆完就冻结在工单里，与代码、测试、文档各自演化、渐行渐远。</div>
+        </div>
+      </div>
+      <div class="cell c3">
+        <div class="corner mono">/03</div>
+        <div class="num-wrap"><div class="num">标准模糊</div></div>
+        <div>
+          <div class="lbl">完成靠人肉验收</div>
+          <div class="desc">「做完了吗」是个模糊问题。缺可验证的完成标准，验收依赖测试人员的经验和开发者的自觉。</div>
+        </div>
+      </div>
+      <div class="cell c4">
+        <div class="corner mono">/04</div>
+        <div class="num-wrap"><div class="num">人力鸿沟</div></div>
+        <div>
+          <div class="lbl">翻译即损耗</div>
+          <div class="desc">需求写得再好，也要人来读、理解、翻译成代码。这道翻译环节既是成本，也是失真的主要来源。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>THE OLD WAY</div>
+      <div>03<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 4: THESIS / QUOTE ============ -->
+  <section class="pq" data-screen-label="04 Thesis">
+    <div class="topbar">
+      <div>IN ONE LINE</div>
+      <div class="pill">THESIS</div>
+    </div>
+
+    <div class="mark" aria-hidden="true">“</div>
+
+    <div class="q">
+      需求，是写给<span class="hl">人</span>看的任务描述；<br/>
+      意图，是写给<span class="hl">人机协作系统</span>的可执行契约。
+    </div>
+
+    <div class="rule"></div>
+    <div class="sub body">
+      AI 负责细化和实现，人负责确认和验收 —— 表达一次，全程复用。
+    </div>
+
+    <div class="stamp" aria-hidden="true">
+      <div class="inner">
+        <div class="big">Intent</div>
+        <div class="sm">可执行契约</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>THESIS</div>
+      <div>04<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 5: REQ vs INTENT TABLE ============ -->
+  <section class="s7a" data-screen-label="05 Compare">
+    <div class="topbar">
+      <div>SIDE BY SIDE</div>
+      <div class="pill">COMPARE</div>
+    </div>
+
+    <h1 class="h-lg display">需求 &nbsp;vs&nbsp; 意图</h1>
+    <div class="badge">面向谁？</div>
+
+    <div class="tbl" style="top:360px; bottom:140px; grid-template-rows:110px repeat(4,1fr);">
+      <div class="row head" style="grid-template-columns:1.1fr 1.1fr 1.3fr;">
+        <div class="lab">维度</div>
+        <div>传统需求</div>
+        <div>意图</div>
+      </div>
+      <div class="row" style="grid-template-columns:1.1fr 1.1fr 1.3fr;">
+        <div class="lab">面向对象</div>
+        <div class="col-pink">人 —— 靠人补上下文、拆任务、判完成</div>
+        <div class="col-green">智能体 —— 只有你给的文本，没有场外记忆</div>
+      </div>
+      <div class="row" style="grid-template-columns:1.1fr 1.1fr 1.3fr;">
+        <div class="lab">上下文</div>
+        <div class="col-pink">留在会议室与聊天记录里</div>
+        <div class="col-green">Why / What / Trade-offs 写进意图本身</div>
+      </div>
+      <div class="row" style="grid-template-columns:1.1fr 1.1fr 1.3fr;">
+        <div class="lab">完成判定</div>
+        <div class="col-pink">模糊，靠人肉读代码验收</div>
+        <div class="col-green">可验证的 Acceptance 清单，逐条核对</div>
+      </div>
+      <div class="row" style="grid-template-columns:1.1fr 1.1fr 1.3fr;">
+        <div class="lab">生命周期</div>
+        <div class="col-pink">一次性，与代码/测试/文档漂移</div>
+        <div class="col-green">持久、结构化、可追踪、可自动化</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>REQ vs INTENT</div>
+      <div>05<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 6: FIVE DIMENSIONS ============ -->
+  <section class="dims" data-screen-label="06 Dimensions">
+    <div class="topbar">
+      <div>THE FIVE</div>
+      <div class="pill">DIMENSIONS</div>
+    </div>
+
+    <h1 class="h display">意图的<br/>五个维度</h1>
+    <p class="sub body">缺了任何一个维度，执行时就得靠猜。这是意图能被智能体正确执行、被人可靠验收的<strong style="color:var(--ink)">最小完整信息集</strong>。</p>
+    <div class="tag-note">你不必一开始就写全 —— 用一两句话说出想法，AI 会结合项目代码提问、补全，最终生成覆盖五维的意图供你确认。</div>
+
+    <div class="panel" aria-hidden="false">
+      <div class="barstack">
+        <div class="dbar db1">
+          <div class="top"><span class="en">WHY</span><span class="cn">为什么做</span></div>
+          <div class="mn">取舍分叉处的方向依据 —— 决定无数微小取舍</div>
+        </div>
+        <div class="dbar db2">
+          <div class="top"><span class="en">WHAT</span><span class="cn">做什么 · 不做什么</span></div>
+          <div class="mn">可观察的行为变化与明确边界（Non-goals）</div>
+        </div>
+        <div class="dbar db3">
+          <div class="top"><span class="en">TRADE-OFFS</span><span class="cn">为什么这样做</span></div>
+          <div class="mn">备选方案、为何取舍、接受了什么代价</div>
+        </div>
+        <div class="dbar db4">
+          <div class="top"><span class="en">WHEN</span><span class="cn">何时能做</span></div>
+          <div class="mn">依赖哪些意图 / 外部前置，决定并行边界</div>
+        </div>
+        <div class="dbar db5">
+          <div class="top"><span class="en">ACCEPTANCE</span><span class="cn">怎样算做完</span></div>
+          <div class="mn">可验证的行为清单 —— 含配套测试与文档</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>FIVE DIMENSIONS</div>
+      <div>06<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 7: WORKED EXAMPLE ============ -->
+  <section class="ex5" data-screen-label="07 Example">
+    <div class="topbar">
+      <div>WORKED EXAMPLE</div>
+      <div class="pill">CSV EXPORT</div>
+    </div>
+
+    <h1 class="h display">五维贯穿一个例子</h1>
+    <div class="kick">以「用户列表 CSV 导出」为例</div>
+
+    <div class="list">
+      <div class="r rc1">
+        <div class="chip"><span class="en">WHY</span><span class="cn">为什么做</span></div>
+        <div class="txt"><div>运营每周要把用户列表导入 Excel 做增长分析，目前靠人工复制粘贴，300+ 行时经常出错、约耗时 1 小时。</div></div>
+      </div>
+      <div class="r rc2">
+        <div class="chip"><span class="en">WHAT</span><span class="cn">做什么 · 不做</span></div>
+        <div class="txt"><div>列表页新增「导出 CSV」按钮，导出当前筛选下的<b>全部</b>用户（非当前分页），含姓名 / 邮箱 / 注册时间 / 状态四列。<br/><b>不做：</b>xlsx 格式、定时自动导出、导出历史记录。</div></div>
+      </div>
+      <div class="r rc3">
+        <div class="chip"><span class="en">TRADE-OFFS</span><span class="cn">为什么这样做</span></div>
+        <div class="txt"><div>大数据量考虑过异步任务 + 邮件通知，但 &lt;5 万行同步流式导出即可，避免任务队列的复杂度。<br/><b>接受的代价：</b>超大结果耗时较长，超时上限设为 60 秒。</div></div>
+      </div>
+      <div class="r rc4">
+        <div class="chip"><span class="en">WHEN</span><span class="cn">何时能做</span></div>
+        <div class="txt"><div>依赖「用户列表筛选参数重构」意图完成（导出要复用其筛选查询）；不阻塞其他前端意图，可与「详情页改版」并行。</div></div>
+      </div>
+      <div class="r rc5">
+        <div class="chip"><span class="en">ACCEPTANCE</span><span class="cn">怎样算做完</span></div>
+        <div class="txt"><div>导出行数 = 筛选结果总数；UTF-8 with BOM，Excel 打开中文不乱码；空结果得到仅含表头的文件；集成测试覆盖上述情况；用户手册补充导出说明。</div></div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>EXAMPLE</div>
+      <div>07<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 8: FIVE-DIM SUMMARY TABLE ============ -->
+  <section class="s7b" data-screen-label="08 Summary">
+    <div class="topbar">
+      <div>AT A GLANCE</div>
+      <div class="pill">SUMMARY</div>
+    </div>
+
+    <h1 class="h-lg display">五维小结</h1>
+    <div class="badge">最小信息集</div>
+
+    <div class="tbl" style="top:360px; bottom:110px; grid-template-rows:100px repeat(5,1fr);">
+      <div class="row head" style="grid-template-columns:0.9fr 1.2fr 1.5fr;">
+        <div class="lab">维度</div>
+        <div>回答的问题</div>
+        <div>缺失的后果</div>
+      </div>
+      <div class="row" style="grid-template-columns:0.9fr 1.2fr 1.5fr;">
+        <div class="lab col-green">Why</div>
+        <div>为什么做</div>
+        <div>取舍分叉处只能瞎猜方向</div>
+      </div>
+      <div class="row" style="grid-template-columns:0.9fr 1.2fr 1.5fr;">
+        <div class="lab col-pink">What</div>
+        <div>做什么、不做什么</div>
+        <div>范围蔓延，或货不对板</div>
+      </div>
+      <div class="row" style="grid-template-columns:0.9fr 1.2fr 1.5fr;">
+        <div class="lab col-orange">Trade-offs</div>
+        <div>为什么这样做</div>
+        <div>被否掉的方案被重新发明</div>
+      </div>
+      <div class="row" style="grid-template-columns:0.9fr 1.2fr 1.5fr;">
+        <div class="lab col-yellow">When</div>
+        <div>何时能做</div>
+        <div>依赖冲突，无法安全并行</div>
+      </div>
+      <div class="row" style="grid-template-columns:0.9fr 1.2fr 1.5fr;">
+        <div class="lab col-green">Acceptance</div>
+        <div>怎样算做完</div>
+        <div>无法判定完成，验收靠人肉读代码</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>FIVE DIMENSIONS</div>
+      <div>08<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 9: SIX FEATURES ============ -->
+  <section class="feat" data-screen-label="09 Traits">
+    <div class="topbar">
+      <div>PROPERTIES → PAYOFF</div>
+      <div class="pill">TRAITS & WINS</div>
+    </div>
+
+    <h1 class="h display">意图的特点</h1>
+
+    <div class="grid6">
+      <div class="cell f1">
+        <div class="idx mono">/01</div>
+        <div class="t">自带上下文，独立可执行</div>
+        <div class="d">每个意图都含 Why / What / Trade-offs / Acceptance，智能体无需场外信息即可开工，人无需读代码即可验收。</div>
+        <div class="win"><span class="arw">→</span>好处：表达一次、全程复用；由人与 AI 在代码语境共同澄清，降低翻译失真。</div>
+      </div>
+      <div class="cell f2">
+        <div class="idx mono">/02</div>
+        <div class="t">粒度合适 Right-sized</div>
+        <div class="d">拆到「一次可完成、可验证」的大小 —— 既不是大而空的史诗，也不是碎成一地的子任务。</div>
+        <div class="win"><span class="arw">→</span>好处：配合依赖图与工作区隔离，多个意图天然可并行、可自动化。</div>
+      </div>
+      <div class="cell f3">
+        <div class="idx mono">/03</div>
+        <div class="t">一个目标就是一个意图</div>
+        <div class="d">代码、测试、文档同属一个变更，折叠进同一意图，从机制上杜绝三者失去同步。</div>
+        <div class="win"><span class="arw">→</span>好处：从源头保证代码 / 测试 / 文档不漂移，作为整体被实现与验收。</div>
+      </div>
+      <div class="cell f4">
+        <div class="idx mono">/04</div>
+        <div class="t">完成标准可验证</div>
+        <div class="d">Acceptance 写的是可观察行为，开发后可依据结论与代码变更独立判定是否真正达成。</div>
+        <div class="win"><span class="arw">→</span>好处：人只在关键节点把关，精力用在刀刃上；全链路可追踪、可审计。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>TRAITS & BENEFITS</div>
+      <div>09<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 10: INTENT LEDGER (c3) ============ -->
+  <section class="s7c" data-screen-label="10 Ledger">
+    <div class="topbar">
+      <div>PART TWO</div>
+      <div class="pill">IN c3</div>
+    </div>
+
+    <h1 class="h-lg display">c3 中意图的构成</h1>
+    <div class="badge">意图台账</div>
+
+    <div class="tbl" style="top:300px; bottom:110px; grid-template-rows:88px repeat(8,1fr);">
+      <div class="row head" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab">组成部分</div>
+        <div>说明</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">标题<span class="en">title</span></div>
+        <div>一句话说清这个意图要达成什么。</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">英文短标题<span class="en">shortEnTitle</span></div>
+        <div>简短的 ASCII 标题，用于派生 Git 分支名 / worktree 目录名。</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">内容<span class="en">content</span></div>
+        <div>完整描述，覆盖 Why / What / Trade-offs / When / Acceptance 五个维度。</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">优先级<span class="en">priority</span></div>
+        <div>P0–P3，P0 最高，决定自动化开发的执行顺序。</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">模块<span class="en">module</span></div>
+        <div>意图所属的模块，由沟通智能体从标题 / 内容推断。</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">状态<span class="en">status</span></div>
+        <div>draft → todo → in_progress → done / cancelled 的状态机。</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">依赖<span class="en">dependsOn</span></div>
+        <div>依赖的其他意图，构成有向依赖图，决定先后开发顺序。</div>
+      </div>
+      <div class="row" style="grid-template-columns:1fr 2.4fr;">
+        <div class="lab col-cream">自动化标记<span class="en">automate</span></div>
+        <div>是否允许编排器自主开发此意图，默认关闭。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>INTENT LEDGER</div>
+      <div>10<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 11: CREATE AN INTENT (TWO WAYS) ============ -->
+  <section class="create" data-screen-label="11 Create">
+    <div class="topbar">
+      <div>GET STARTED</div>
+      <div class="pill">RECOMMENDED</div>
+    </div>
+
+    <h1 class="h display">如何创建意图</h1>
+
+    <div class="cols">
+      <div class="panel p-a">
+        <div>
+          <div class="tag">推荐入口</div>
+          <div class="pt">与意图沟通<br/>智能体对话</div>
+        </div>
+        <div class="lead">它是<b>只读</b>的 —— 能读代码、查资料、查已有意图、提问澄清，但永不修改文件、不执行命令。约束在<b>工具层</b>强制执行，不靠提示词自觉。</div>
+        <div class="bulb" aria-hidden="true">💡</div>
+      </div>
+      <div class="panel p-steps">
+        <div class="st s1">
+          <span class="sn">01</span>
+          <div class="sc"><div class="t">进入意图视图</div><div class="d">在工作区界面点击 💡（意图）按钮，打开该项目的意图沟通会话。</div></div>
+        </div>
+        <div class="st s2">
+          <span class="sn">02</span>
+          <div class="sc"><div class="t">说出你的想法</div><div class="d">用自然语言描述你想做的事，比如「给用户列表加导出功能，要考虑大数据量」。</div></div>
+        </div>
+        <div class="st s3">
+          <span class="sn">03</span>
+          <div class="sc"><div class="t">让智能体帮你细化</div><div class="d">多轮对话，把想法整理成一个或多个大小合适、覆盖<b>五个维度</b>的意图条目，并标注优先级、模块与依赖。</div></div>
+        </div>
+        <div class="st s4">
+          <span class="sn">04</span>
+          <div class="sc"><div class="t">确认保存</div><div class="d">调用 <b>save_intents</b> 时弹出确认面板，你点「允许」才以 todo 落库；点「拒绝」则不写入任何内容。</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot"><span class="hl">没有你的确认，任何意图都不会落库</span> —— 保存确认由处理器强制弹出，拒绝即什么都不写入。</div>
+
+    <div class="slide-meta">
+      <div>CREATE AN INTENT</div>
+      <div>11<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 12: FROM INTENT TO DEVELOPMENT ============ -->
+  <section class="dev" data-screen-label="12 Pipeline">
+    <div class="topbar">
+      <div>THE PIPELINE</div>
+      <div class="pill">INTENT → PR</div>
+    </div>
+
+    <h1 class="h display">从意图到开发</h1>
+
+    <div class="flow">
+      <div class="step d1">
+        <div class="n">01</div>
+        <div class="t">意图 · todo</div>
+        <div class="d">经你确认落库，以 todo 状态进入待办队列。</div>
+        <div class="arrow"></div>
+      </div>
+      <div class="step d2">
+        <div class="n">02</div>
+        <div class="t">启动开发</div>
+        <div class="d">后台会话，可选 worktree 隔离；完成后提交 / 推送 / 建 PR。</div>
+        <div class="arrow"></div>
+      </div>
+      <div class="step d3">
+        <div class="n">03</div>
+        <div class="t">标记 done</div>
+        <div class="d">意图关联沟通、规约、会话、分支与 PR 的完整链路。</div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="callout c-sdd">
+        <span class="lab">◇ 可选 · 规约驱动 SDD</span>
+        打开工作区 SDD 开关后，在 01 与 02 之间插入<b>「写规约 → 人工批准」</b>两步，作为进入开发的质量门禁。
+      </div>
+      <div class="callout c-auto">
+        <span class="lab">自动化编排</span>
+        给意图打上 <b>automate</b> 标记并启动编排器，c3 便按优先级与依赖顺序，逐个自主开发 → 判定完成 → 提交推送 → 下一个。
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>FROM INTENT TO CODE</div>
+      <div>12<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+  <!-- ============ 13: CLOSING ============ -->
+  <section class="s8" data-screen-label="13 Closing">
+    <div class="topbar">
+      <div>END OF DECK</div>
+      <div class="pill">FIN.</div>
+    </div>
+
+    <h1 class="h display">从想法<br/>到合并</h1>
+
+    <p class="strap body">
+      选一个小而清晰的想法，完整走一遍「对话 → 确认 → 启动开发」。<br/>
+      <span class="hl">小事直接聊，正经的功能演进，用意图。</span>
+    </p>
+
+    <div class="stamp" aria-hidden="true">
+      <div class="inner">
+        <div class="num">c3</div>
+        <div class="lbl">意图驱动开发</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · GET STARTED</div>
+      <div>13<span class="dot"></span>13</div>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
