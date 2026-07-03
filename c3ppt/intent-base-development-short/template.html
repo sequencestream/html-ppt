@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>从需求到意图 · 精简版 — From Requirements to Intent (Short)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<!-- Shared Creative Mode design system (tokens, reset, stage, chrome, tables, badge) -->
+<link rel="stylesheet" href="../../templates/creative-mode/share/creative-mode.css">
+<script src="../../templates/creative-mode/share/creative-mode.js"></script>
+<style>
+  /* Deck-specific slide layouts. Common framework lives in
+     ../../templates/creative-mode/share/creative-mode.css */
+
+  /* --- SLIDE 1: TITLE / POSTER --- */
+  .s1 .title{
+    position:absolute; left:96px; top:50%; transform:translateY(-50%);
+    font-size:180px; color:var(--ink); width:900px;
+  }
+  .s1 .title .row{ display:block; }
+  .s1 .poster{
+    position:absolute; right:96px; top:140px; bottom:140px;
+    width:760px;
+    background:var(--green);
+    border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s1 .poster .switch{
+    position:relative; width:380px; height:380px;
+    background:var(--pink); border:4px solid var(--ink);
+    box-shadow: 24px 24px 0 var(--orange), 24px 24px 0 4px var(--ink);
+  }
+  .s1 .poster .switch .lever{
+    position:absolute; top:64px; left:64px; width:240px; height:170px;
+    background:#FBD0E3; border:4px solid var(--ink);
+    transform: skewY(-8deg);
+  }
+  .s1 .poster .switch .lever:after{
+    content:""; position:absolute; left:0; right:0; bottom:-30px; height:30px;
+    background:var(--pink-dark); border:4px solid var(--ink); border-top:0;
+  }
+  .s1 .poster .switch .label-on{
+    position:absolute; top:78px; right:60px; font-family:"Archivo Black"; font-size:32px; color:var(--ink);
+  }
+  .s1 .poster .switch .label-off{
+    position:absolute; bottom:48px; left:0; right:0; text-align:center;
+    font-family:"Archivo Black"; font-size:32px; color:var(--ink);
+  }
+  .s1 .tagline{
+    position:absolute; left:96px; top:150px;
+    font-family:var(--font-mono); font-size:24px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--ink);
+  }
+  .s1 .tagline span{ display:inline-block; width:60px; height:3px; background:var(--ink); vertical-align:middle; margin-right:18px; transform:translateY(-3px);}
+  .s1 .footnote{
+    position:absolute; left:96px; bottom:150px;
+    font-family:var(--font-body); font-size:26px; color:var(--ink-2); max-width:760px; line-height:1.5;
+  }
+
+  /* --- SLIDE 2 (QUOTE / THESIS) --- */
+  .pq .mark{
+    position:absolute; left:88px; top:150px;
+    font-family:"Archivo Black"; font-size:300px; color:var(--pink); line-height:.7;
+  }
+  .pq .q{
+    position:absolute; left:96px; top:340px; right:320px;
+    font-family:"Noto Serif SC",serif; font-weight:900; font-size:88px; line-height:1.32; color:var(--ink);
+  }
+  .pq .q .hl{ background:var(--yellow); padding:0 6px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+  .pq .rule{ position:absolute; left:96px; bottom:250px; width:140px; height:10px; background:var(--orange); }
+  .pq .sub{
+    position:absolute; left:96px; bottom:150px; right:320px;
+    font-size:30px; line-height:1.5; color:var(--ink-2);
+  }
+  .pq .sub strong{ color:var(--ink); }
+  .pq .stamp{
+    position:absolute; right:110px; bottom:150px;
+    width:300px; height:300px; background:var(--green); border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; transform:rotate(-6deg);
+  }
+  .pq .stamp .inner{
+    width:244px; height:244px; border:4px solid var(--cream); border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; color:var(--cream); padding:18px; box-sizing:border-box;
+  }
+  .pq .stamp .inner .big{ font-family:"Archivo Black"; font-size:52px; line-height:.95; }
+  .pq .stamp .inner .sm{ font-family:"Noto Serif SC"; font-weight:700; font-size:22px; margin-top:10px; }
+
+  /* --- SLIDE 3: FIVE DIMENSIONS STACK --- */
+  .dims .h{ position:absolute; left:96px; top:120px; right:1010px; font-size:110px; line-height:1.0; color:var(--ink); }
+  .dims .sub{ position:absolute; left:96px; top:470px; right:1060px; font-size:27px; line-height:1.6; color:var(--ink-2); }
+  .dims .sub strong{ color:var(--ink); }
+  .dims .tag-note{ position:absolute; left:96px; bottom:150px; font-family:var(--font-mono); font-size:24px; letter-spacing:.06em; color:var(--ink-2); max-width:760px; line-height:1.5; text-transform:none; }
+  .dims .panel{
+    position:absolute; right:80px; top:110px; width:940px; height:860px;
+    background:var(--green); border:4px solid var(--ink);
+  }
+  .dims .barstack{ position:absolute; left:56px; right:56px; top:56px; bottom:56px; display:flex; flex-direction:column; justify-content:space-between; }
+  .dims .dbar{
+    height:128px; border:4px solid var(--ink); box-shadow:14px 14px 0 var(--ink);
+    display:flex; flex-direction:column; justify-content:center; padding:0 28px; box-sizing:border-box;
+  }
+  .dims .dbar .top{ display:flex; align-items:baseline; gap:16px; }
+  .dims .dbar .en{ font-family:"Archivo Black"; font-size:38px; line-height:1; }
+  .dims .dbar .cn{ font-family:"Noto Serif SC"; font-weight:900; font-size:26px; }
+  .dims .dbar .mn{ margin-top:8px; font-size:20px; line-height:1.3; color:var(--ink-2); }
+  .dims .db1{ background:var(--pink); }
+  .dims .db2{ background:var(--yellow); }
+  .dims .db3{ background:var(--orange); color:var(--cream); }
+  .dims .db3 .mn{ color:var(--cream); }
+  .dims .db4{ background:var(--cream); }
+  .dims .db5{ background:var(--cream-2); }
+
+  /* --- SLIDE 4: CLOSING / BIG MARK --- */
+  .s8{ background:var(--green) !important; color:var(--cream); }
+  .s8 .topbar, .s8 .slide-meta{ color:var(--cream); }
+  .s8 .topbar .pill{ border-color:var(--cream); }
+  .s8 .slide-meta .dot{ background:var(--cream); }
+  .s8 .h{
+    position:absolute; left:96px; top:230px; right:680px;
+    font-size:190px; line-height:1.0; color:var(--cream);
+  }
+  .s8 .strap{
+    position:absolute; left:96px; top:720px; right:640px;
+    font-size:32px; line-height:1.55;
+  }
+  .s8 .strap .hl{ background:var(--yellow); color:var(--ink); padding:2px 8px; }
+  .s8 .stamp{
+    position:absolute; right:120px; bottom:160px;
+    width:340px; height:340px; background:var(--pink);
+    border:4px solid var(--cream);
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-6deg);
+  }
+  .s8 .stamp .inner{
+    width:280px; height:280px; border:4px solid var(--cream); border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:20px; box-sizing:border-box;
+  }
+  .s8 .stamp .num{ font-family:"Archivo Black"; font-size:72px; line-height:.9; margin-bottom:6px; }
+  .s8 .stamp .lbl{ font-family:"Noto Serif SC"; font-weight:700; font-size:24px; letter-spacing:.02em; margin-top:8px;}
+
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- ============ 1: TITLE / POSTER ============ -->
+  <section class="s1" data-screen-label="01 Title">
+    <div class="tagline">
+      <span></span>c3 精简版 &nbsp;/&nbsp; FROM REQUIREMENTS TO INTENT
+    </div>
+
+    <div class="title display">
+      <span class="row">从需求</span>
+      <span class="row" style="color:var(--orange)">到意图</span>
+    </div>
+
+    <div class="footnote">
+      AI 时代的表达单元之变 —— 意图不是换个名字的需求，而是写给「人机协作系统」的可执行契约。四页看懂。
+    </div>
+
+    <div class="poster" aria-hidden="true">
+      <div class="switch">
+        <div class="lever"></div>
+        <div class="label-on">ON</div>
+        <div class="label-off">OFF</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · QUICK TAKE</div>
+      <div>01<span class="dot"></span>04</div>
+    </div>
+  </section>
+
+  <!-- ============ 2: THESIS / QUOTE ============ -->
+  <section class="pq" data-screen-label="02 Thesis">
+    <div class="topbar">
+      <div>IN ONE LINE</div>
+      <div class="pill">THESIS</div>
+    </div>
+
+    <div class="mark" aria-hidden="true">“</div>
+
+    <div class="q">
+      需求，是写给<span class="hl">人</span>看的任务描述；<br/>
+      意图，是写给<span class="hl">人机协作系统</span>的可执行契约。
+    </div>
+
+    <div class="rule"></div>
+    <div class="sub body">
+      AI 已能读代码、改文件、跑测试，<strong>执行不再是瓶颈</strong> —— 瓶颈变成「你到底想要什么」能否被<strong>精确、完整、可验证</strong>地表达。意图为「AI 执行、人把关」而生：表达一次，全程复用。
+    </div>
+
+    <div class="stamp" aria-hidden="true">
+      <div class="inner">
+        <div class="big">Intent</div>
+        <div class="sm">可执行契约</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>THESIS</div>
+      <div>02<span class="dot"></span>04</div>
+    </div>
+  </section>
+
+  <!-- ============ 3: FIVE DIMENSIONS ============ -->
+  <section class="dims" data-screen-label="03 Dimensions">
+    <div class="topbar">
+      <div>THE FIVE</div>
+      <div class="pill">DIMENSIONS</div>
+    </div>
+
+    <h1 class="h display">意图的<br/>五个维度</h1>
+    <p class="sub body">缺了任何一个维度，执行时就得靠猜。这是意图能被智能体正确执行、被人可靠验收的<strong>最小完整信息集</strong>。</p>
+    <div class="tag-note">你不必一开始就写全 —— 用一两句话说出想法，AI 会结合项目代码提问、补全，生成覆盖五维的意图供你确认。</div>
+
+    <div class="panel" aria-hidden="false">
+      <div class="barstack">
+        <div class="dbar db1">
+          <div class="top"><span class="en">WHY</span><span class="cn">为什么做</span></div>
+          <div class="mn">取舍分叉处的方向依据 —— 决定无数微小取舍</div>
+        </div>
+        <div class="dbar db2">
+          <div class="top"><span class="en">WHAT</span><span class="cn">做什么 · 不做什么</span></div>
+          <div class="mn">可观察的行为变化与明确边界（Non-goals）</div>
+        </div>
+        <div class="dbar db3">
+          <div class="top"><span class="en">TRADE-OFFS</span><span class="cn">为什么这样做</span></div>
+          <div class="mn">备选方案、为何取舍、接受了什么代价</div>
+        </div>
+        <div class="dbar db4">
+          <div class="top"><span class="en">WHEN</span><span class="cn">何时能做</span></div>
+          <div class="mn">依赖哪些意图 / 外部前置，决定并行边界</div>
+        </div>
+        <div class="dbar db5">
+          <div class="top"><span class="en">ACCEPTANCE</span><span class="cn">怎样算做完</span></div>
+          <div class="mn">可验证的行为清单 —— 含配套测试与文档</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>FIVE DIMENSIONS</div>
+      <div>03<span class="dot"></span>04</div>
+    </div>
+  </section>
+
+  <!-- ============ 4: CLOSING ============ -->
+  <section class="s8" data-screen-label="04 Closing">
+    <div class="topbar">
+      <div>END OF DECK</div>
+      <div class="pill">FIN.</div>
+    </div>
+
+    <h1 class="h display">从想法<br/>到合并</h1>
+
+    <p class="strap body">
+      选一个小而清晰的想法，完整走一遍「对话 → 确认 → 启动开发」。<br/>
+      <span class="hl">小事直接聊，正经的功能演进，用意图。</span>
+    </p>
+
+    <div class="stamp" aria-hidden="true">
+      <div class="inner">
+        <div class="num">c3</div>
+        <div class="lbl">意图驱动开发</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · QUICK TAKE</div>
+      <div>04<span class="dot"></span>04</div>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
