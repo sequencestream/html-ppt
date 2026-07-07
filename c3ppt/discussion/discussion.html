@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>从人开会到 Agent 讨论 — Agent Discussion</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<!-- Shared Creative Mode design system (tokens, reset, stage, chrome, tables, badge) -->
+<link rel="stylesheet" href="../../templates/creative-mode/share/creative-mode.css">
+<script src="../../templates/creative-mode/share/creative-mode.js"></script>
+<style>
+  /* Deck-specific slide layouts. Common framework lives in
+     ../../templates/creative-mode/share/creative-mode.css */
+
+  /* --- SLIDE 1: TITLE / POSTER (ROUND TABLE) --- */
+  .s1 .tagline{
+    position:absolute; left:96px; top:150px;
+    font-family:var(--font-mono); font-size:24px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink);
+  }
+  .s1 .tagline span{ display:inline-block; width:60px; height:3px; background:var(--ink); vertical-align:middle; margin-right:18px; transform:translateY(-3px);}
+  .s1 .title{
+    position:absolute; left:96px; top:50%; transform:translateY(-50%);
+    font-size:170px; color:var(--ink); width:940px;
+  }
+  .s1 .title .row{ display:block; }
+  .s1 .footnote{
+    position:absolute; left:96px; bottom:130px;
+    font-family:var(--font-body); font-size:26px; color:var(--ink-2); max-width:900px; line-height:1.5;
+  }
+  .s1 .poster{
+    position:absolute; right:96px; top:140px; bottom:140px; width:760px;
+    background:var(--green); border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s1 .rt{ position:relative; width:520px; height:520px; }
+  .s1 .rt .table{
+    position:absolute; inset:130px; border:34px solid var(--ink); border-radius:50%;
+    background:var(--yellow); box-shadow:14px 14px 0 var(--orange);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s1 .rt .table .word{ font-family:"Archivo Black"; font-size:34px; letter-spacing:.04em; color:var(--ink); text-align:center; line-height:1.05; }
+  .s1 .rt .seat{
+    position:absolute; width:118px; height:118px; border:4px solid var(--ink); border-radius:50%;
+    background:var(--cream); display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-weight:700; font-size:24px; color:var(--ink);
+  }
+  .s1 .rt .seat.you{ background:var(--pink); }
+  .s1 .rt .s-a{ left:201px; top:-8px; }
+  .s1 .rt .s-b{ right:-18px; top:120px; }
+  .s1 .rt .s-c{ right:22px; bottom:-4px; }
+  .s1 .rt .s-d{ left:22px; bottom:-4px; }
+  .s1 .rt .s-e{ left:-18px; top:120px; }
+
+  /* --- SLIDE 2: FIVE PROBLEMS (3 + 2 CARD GRID) --- */
+  .probs .h{ position:absolute; left:96px; top:118px; right:96px; font-size:56px; line-height:1.08; color:var(--ink); }
+  .probs .grid{ position:absolute; left:96px; right:96px; top:280px; bottom:120px; display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:1fr 1fr; gap:24px; }
+  .probs .card{ border:4px solid var(--ink); box-shadow:12px 12px 0 var(--ink); padding:26px 30px; box-sizing:border-box; display:flex; flex-direction:column; grid-column:span 2; }
+  .probs .card .n{ font-family:"Archivo Black"; font-size:38px; line-height:1; }
+  .probs .card .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:28px; margin:8px 0 10px; line-height:1.18; }
+  .probs .card .d{ font-size:22px; line-height:1.45; color:var(--ink-2); }
+  .probs .r2 .card{ grid-column:span 3; }
+  .probs .c1{ background:var(--pink); }
+  .probs .c2{ background:var(--yellow); }
+  .probs .c3{ background:var(--cream-2); }
+  .probs .c4{ background:var(--orange); color:var(--cream); }
+  .probs .c4 .d{ color:var(--cream); }
+  .probs .c5{ background:var(--green); color:var(--cream); }
+  .probs .c5 .d{ color:var(--cream); }
+
+  /* --- SLIDE 3: FIVE DESIGNS (STACKED BARS) + QUOTE --- */
+  .def .h{ position:absolute; left:96px; top:118px; right:96px; font-size:52px; line-height:1.08; color:var(--ink); }
+  .def .stack{ position:absolute; left:96px; right:96px; top:250px; bottom:230px; display:flex; flex-direction:column; justify-content:space-between; }
+  .def .rbar{ flex:1; margin-bottom:16px; border:4px solid var(--ink); box-shadow:10px 10px 0 var(--ink); display:flex; align-items:stretch; background:var(--cream-2); }
+  .def .rbar:last-child{ margin-bottom:0; }
+  .def .rbar .num{ flex:0 0 100px; display:flex; align-items:center; justify-content:center; font-family:"Archivo Black"; font-size:52px; border-right:4px solid var(--ink); background:var(--green); color:var(--cream); }
+  .def .rbar .body{ padding:14px 30px; display:flex; align-items:center; gap:24px; }
+  .def .rbar .t{ flex:0 0 300px; font-family:"Noto Serif SC"; font-weight:900; font-size:28px; line-height:1.15; }
+  .def .rbar .d{ font-size:22px; line-height:1.42; color:var(--ink-2); }
+  .def .quote{ position:absolute; left:96px; right:96px; bottom:120px; font-family:"Noto Serif SC"; font-weight:700; font-size:30px; line-height:1.4; color:var(--ink); border-left:12px solid var(--orange); padding-left:26px; }
+
+  /* --- SLIDE 4: FIVE SCENARIOS (TABLE) --- */
+  .scenes .h{ position:absolute; left:96px; top:118px; right:96px; font-size:56px; line-height:1.06; color:var(--ink); }
+  .scenes .tbl{ top:290px; grid-template-rows:auto repeat(5,1fr); }
+  .scenes .tbl .row{ grid-template-columns:280px 360px 1fr; }
+  .scenes .tbl .ty{ font-family:"Archivo Black"; font-size:30px; letter-spacing:.02em; }
+  .scenes .note{ position:absolute; left:96px; right:96px; bottom:120px; border:4px solid var(--ink); background:var(--yellow); box-shadow:10px 10px 0 var(--ink); padding:22px 30px; box-sizing:border-box; font-size:24px; line-height:1.5; color:var(--ink); }
+  .scenes .note strong{ font-family:"Noto Serif SC"; font-weight:900; }
+
+  /* --- SLIDE 5: FIVE BENEFITS (NUMBERED ROWS) --- */
+  .ben .h{ position:absolute; left:96px; top:118px; right:96px; font-size:60px; line-height:1.0; color:var(--ink); }
+  .ben .list{ position:absolute; left:96px; right:96px; top:290px; bottom:120px; display:flex; flex-direction:column; justify-content:space-between; }
+  .ben .row{ display:flex; align-items:center; border:4px solid var(--ink); background:var(--cream-2); box-shadow:10px 10px 0 var(--ink); padding:0; overflow:hidden; height:104px; }
+  .ben .row .n{ flex:0 0 104px; align-self:stretch; display:flex; align-items:center; justify-content:center; font-family:"Archivo Black"; font-size:52px; color:var(--cream); background:var(--green); border-right:4px solid var(--ink); }
+  .ben .row .t{ flex:0 0 380px; font-family:"Noto Serif SC"; font-weight:900; font-size:28px; padding:0 30px; line-height:1.15; }
+  .ben .row .d{ flex:1; font-size:22px; line-height:1.4; color:var(--ink-2); padding:0 34px 0 0; }
+  .ben .row.k .n{ background:var(--orange); }
+
+  /* --- SLIDE 6: ANATOMY + THREE ROLES (TWO COLUMNS) --- */
+  .anat .h{ position:absolute; left:96px; top:118px; right:96px; font-size:54px; line-height:1.06; color:var(--ink); }
+  .anat .cols{ position:absolute; left:96px; right:96px; top:280px; bottom:120px; display:grid; grid-template-columns:1fr 1fr; gap:34px; }
+  .anat .panel{ border:4px solid var(--ink); box-shadow:12px 12px 0 var(--ink); box-sizing:border-box; padding:26px 30px; }
+  .anat .panel .cap{ font-family:"Archivo Black"; font-size:26px; letter-spacing:.02em; margin-bottom:18px; }
+  .anat .left{ background:var(--cream-2); }
+  .anat .frow{ display:flex; align-items:baseline; gap:16px; margin-bottom:13px; font-size:22px; line-height:1.4; }
+  .anat .frow .fk{ flex:0 0 240px; font-family:"Noto Serif SC"; font-weight:900; color:var(--ink); }
+  .anat .frow .fk .en{ font-family:var(--font-mono); font-weight:400; font-size:16px; color:var(--ink-2); display:block; }
+  .anat .frow .fv{ color:var(--ink-2); }
+  .anat .right{ background:var(--green); color:var(--cream); }
+  .anat .right .cap{ color:var(--cream); }
+  .anat .role{ border:3px solid var(--cream); padding:16px 20px; margin-bottom:16px; }
+  .anat .role:last-child{ margin-bottom:0; }
+  .anat .role .rn{ font-family:"Noto Serif SC"; font-weight:900; font-size:25px; margin-bottom:6px; }
+  .anat .role .rn .en{ font-family:var(--font-mono); font-weight:400; font-size:17px; opacity:.8; }
+  .anat .role .rd{ font-size:21px; line-height:1.42; }
+
+  /* --- SLIDE 7: LIFECYCLE FLOW + INTERVENTIONS --- */
+  .flow .h{ position:absolute; left:96px; top:118px; right:96px; font-size:52px; line-height:1.06; color:var(--ink); }
+  .flow .track{ position:absolute; left:96px; right:96px; top:270px; height:230px; display:flex; align-items:stretch; }
+  .flow .step{ flex:1; border:4px solid var(--ink); box-shadow:10px 10px 0 var(--ink); padding:20px 20px; box-sizing:border-box; display:flex; flex-direction:column; }
+  .flow .step .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:26px; margin-bottom:10px; line-height:1.12; }
+  .flow .step .d{ font-size:19px; line-height:1.38; }
+  .flow .arw{ flex:0 0 52px; display:flex; align-items:center; justify-content:center; font-family:"Archivo Black"; font-size:44px; color:var(--ink); }
+  .flow .st1{ background:var(--cream-2); }
+  .flow .st2{ background:var(--yellow); }
+  .flow .st3{ background:var(--green); color:var(--cream); }
+  .flow .st3 .d{ color:var(--cream); }
+  .flow .st4{ background:var(--pink); }
+  .flow .subcap{ position:absolute; left:96px; top:540px; font-family:var(--font-mono); font-size:22px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); }
+  .flow .ivs{ position:absolute; left:96px; right:96px; top:590px; height:230px; display:grid; grid-template-columns:repeat(3,1fr); gap:26px; }
+  .flow .iv{ border:4px solid var(--ink); box-shadow:10px 10px 0 var(--ink); background:var(--cream-2); padding:22px 26px; box-sizing:border-box; display:flex; flex-direction:column; }
+  .flow .iv .ivt{ font-family:"Archivo Black"; font-size:28px; }
+  .flow .iv .ivw{ font-family:var(--font-mono); font-size:18px; color:var(--orange); margin:6px 0 12px; letter-spacing:.04em; }
+  .flow .iv .ivd{ font-size:21px; line-height:1.42; color:var(--ink-2); }
+  .flow .note{ position:absolute; left:96px; right:96px; bottom:120px; font-size:23px; line-height:1.45; color:var(--ink-2); }
+  .flow .note strong{ color:var(--ink); }
+  .flow .note code{ font-family:var(--font-mono); background:var(--cream-2); border:2px solid var(--ink); padding:1px 8px; font-size:20px; }
+
+  /* --- SLIDE 8: CLOSING / BIG MARK --- */
+  .s8{ background:var(--green) !important; color:var(--cream); }
+  .s8 .topbar, .s8 .slide-meta{ color:var(--cream); }
+  .s8 .topbar .pill{ border-color:var(--cream); }
+  .s8 .slide-meta .dot{ background:var(--cream); }
+  .s8 .h{ position:absolute; left:96px; top:280px; right:600px; font-size:118px; line-height:1.06; color:var(--cream); }
+  .s8 .strap{ position:absolute; left:96px; top:660px; right:600px; font-size:32px; line-height:1.55; }
+  .s8 .strap .hl{ background:var(--yellow); color:var(--ink); padding:2px 8px; }
+  .s8 .stamp{ position:absolute; right:120px; bottom:160px; width:340px; height:340px; background:var(--pink); border:4px solid var(--cream); display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  .s8 .stamp .inner{ width:280px; height:280px; border:4px solid var(--cream); border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; box-sizing:border-box; }
+  .s8 .stamp .num{ font-family:"Archivo Black"; font-size:64px; line-height:.9; }
+  .s8 .stamp .lbl{ font-family:"Noto Serif SC"; font-weight:700; font-size:24px; letter-spacing:.02em; margin-top:10px;}
+
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- ============ 1: TITLE / POSTER ============ -->
+  <section class="s1" data-screen-label="01 Title">
+    <div class="tagline">
+      <span></span>c3 GUIDE &nbsp;/&nbsp; AGENT DISCUSSION
+    </div>
+
+    <div class="title display">
+      <span class="row">从人开会</span>
+      <span class="row" style="font-size:150px;">到</span>
+      <span class="row" style="font-size:130px; color:var(--orange)">Agent 讨论</span>
+    </div>
+
+    <div class="footnote">
+      把一群人拉进会议室讨论出结论，正在演变为<strong>让一组 AI 智能体围绕你的目标进行圆桌研讨</strong>。人负责定方向、做判断；阅读代码、检索资料、独立发言交给 agent。
+    </div>
+
+    <div class="poster" aria-hidden="true">
+      <div class="rt">
+        <div class="table"><div class="word">ROUND<br/>TABLE</div></div>
+        <div class="seat s-a">A1</div>
+        <div class="seat s-b">A2</div>
+        <div class="seat s-c">A3</div>
+        <div class="seat s-d you">YOU</div>
+        <div class="seat s-e">A4</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · DISCUSSION</div>
+      <div>01<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+  <!-- ============ 2: THE PROBLEM (FIVE) ============ -->
+  <section class="probs" data-screen-label="02 Context">
+    <div class="topbar">
+      <div>THE PROBLEM</div>
+      <div class="pill">CONTEXT</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">会议本身没错，错的是它积累的一系列顽疾</h1>
+
+    <div class="grid">
+      <div class="card c1">
+        <div class="n">01</div>
+        <div class="t">组织成本高，质量看运气</div>
+        <div class="d">凑齐合适的人要协调日程、往往等好几天；到场的人未必做了功课，缺了关键领域知识就注定开不出结果。</div>
+      </div>
+      <div class="card c2">
+        <div class="n">02</div>
+        <div class="t">发言不均衡，声音大的人主导</div>
+        <div class="d">职级高、嗓门大、先发言的人天然占优；「共识」很多时候只是「没人再反驳」。</div>
+      </div>
+      <div class="card c3">
+        <div class="n">03</div>
+        <div class="t">过程丢失，结论模糊</div>
+        <div class="d">哪些方案被否掉、为什么、结论的前提是什么 —— 散落在白板和记忆里，几周后没人说得清。</div>
+      </div>
+      <div class="r2" style="display:contents">
+        <div class="card c4">
+          <div class="n">04</div>
+          <div class="t">讨论与执行脱节</div>
+          <div class="d">结论躺在纪要里，还要有人翻译成需求、拆成任务。这道翻译既是延迟也是失真 —— 执行的人往往只拿到一句结论，没有来龙去脉。</div>
+        </div>
+        <div class="card c5">
+          <div class="n">05</div>
+          <div class="t">会议室里可能只剩一个人</div>
+          <div class="d">「开会」默认背后是一群人；但当项目由一位工程师带一队智能体驱动，你没法把 agent 请进会议室，也不该让唯一的人替所有视角发言。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>CONTEXT</div>
+      <div>02<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+  <!-- ============ 3: WHAT IT IS (FIVE DESIGNS) ============ -->
+  <section class="def" data-screen-label="03 Definition">
+    <div class="topbar">
+      <div>THE DEFINITION</div>
+      <div class="pill">WHAT IT IS</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">多智能体、多轮、圆桌研讨，收敛出结构化结论</h1>
+
+    <div class="stack">
+      <div class="rbar">
+        <div class="num">1</div>
+        <div class="body">
+          <div class="t">每个参与者独立作答</div>
+          <div class="d">同一问题并行发给多个智能体，各自基于同样的讨论记录独立表达 —— 不存在「先发言的人带偏全场」。</div>
+        </div>
+      </div>
+      <div class="rbar">
+        <div class="num">2</div>
+        <div class="body">
+          <div class="t">主持人负责组织与收敛</div>
+          <div class="d">把目标拆成子议题、逐个推进、归纳观点、向各方确认、写下结论 —— 发散和收敛都有明确机制。</div>
+        </div>
+      </div>
+      <div class="rbar">
+        <div class="num">3</div>
+        <div class="body">
+          <div class="t">讨论前先做功课</div>
+          <div class="d">只读研究智能体先读代码、检索资料，把事实、现状、约束整理好 —— 所有人带着同一份背景材料入场。</div>
+        </div>
+      </div>
+      <div class="rbar">
+        <div class="num">4</div>
+        <div class="body">
+          <div class="t">人随时可以介入</div>
+          <div class="d">你可以旁观、暂停、插话、追问，但不必全程在场；完整发言记录和结论随时回看。</div>
+        </div>
+      </div>
+      <div class="rbar">
+        <div class="num">5</div>
+        <div class="body">
+          <div class="t">结论直通执行</div>
+          <div class="d">结论可一键转化为意图（Intent），进入「确认 → 开发 → 验收」，不再需要人工翻译。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote">传统会议靠「凑人 + 抢话 + 纪要」；Agent 讨论是「随叫随到的多视角圆桌，全程留痕，结论直接接入开发」。</div>
+
+    <div class="slide-meta">
+      <div>WHAT IT IS</div>
+      <div>03<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+  <!-- ============ 4: FIVE SCENARIOS ============ -->
+  <section class="scenes" data-screen-label="04 Scenarios">
+    <div class="topbar">
+      <div>WHEN TO USE</div>
+      <div class="pill">SCENARIOS</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">方向不明、需要多视角碰撞时，才开讨论</h1>
+
+    <div class="tbl">
+      <div class="row head">
+        <div>场景</div>
+        <div>讨论类型</div>
+        <div>典型问题</div>
+      </div>
+      <div class="row">
+        <div class="lab">头脑风暴</div>
+        <div class="ty col-pink" style="color:var(--ink)">Brainstorm</div>
+        <div>「缓存层有哪些可行的演进方向？」—— 先发散再收敛</div>
+      </div>
+      <div class="row">
+        <div class="lab">方案决策</div>
+        <div class="ty col-yellow">Decision</div>
+        <div>「消息队列选 Kafka 还是 NATS？」—— 按标准对比、选一个并说明理由</div>
+      </div>
+      <div class="row">
+        <div class="lab">评审把关</div>
+        <div class="ty col-orange">Review</div>
+        <div>「这份 API 设计稿有什么问题？」—— 多视角暴露风险</div>
+      </div>
+      <div class="row">
+        <div class="lab">计划拆解</div>
+        <div class="ty col-green">Planning</div>
+        <div>「下个季度的重构怎么排？」—— 拆成有序执行计划</div>
+      </div>
+      <div class="row">
+        <div class="lab">复盘总结</div>
+        <div class="ty col-cream" style="color:var(--ink)">Retro</div>
+        <div>「这次线上事故暴露了什么？」—— 梳理发生了什么、为什么、下次改什么</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>目标已清晰、只差动手的事不需要讨论 —— 直接创建意图或在会话里开工。</strong>
+      判断标准：能一句话说清「做什么、怎么算做完」就不必开；说出口的是「我拿不准…」「有没有更好的…」，那才是讨论的用武之地。
+    </div>
+
+    <div class="slide-meta">
+      <div>SCENARIOS</div>
+      <div>04<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+  <!-- ============ 5: FIVE BENEFITS ============ -->
+  <section class="ben" data-screen-label="05 Benefits">
+    <div class="topbar">
+      <div>THE VALUE</div>
+      <div class="pill">BENEFITS</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">为什么值得从会议室搬到圆桌</h1>
+
+    <div class="list">
+      <div class="row k">
+        <div class="n">1</div>
+        <div class="t">零协调成本<br/>随时可开</div>
+        <div class="d">不用约时间、不用等人，想法冒出来就发起，几分钟拿到多视角结论。</div>
+      </div>
+      <div class="row">
+        <div class="n">2</div>
+        <div class="t">视角天然多元且均衡</div>
+        <div class="d">参与者可以是不同厂商、不同配置的智能体，独立发言、机会均等 —— 没有职级压制和会议室政治。</div>
+      </div>
+      <div class="row">
+        <div class="n">3</div>
+        <div class="t">过程全程留痕</div>
+        <div class="d">每轮谁说了什么、议题如何推进、结论如何得出，完整记录随时回看 —— 结论不再是无源之水。</div>
+      </div>
+      <div class="row">
+        <div class="n">4</div>
+        <div class="t">人在关键处把关</div>
+        <div class="d">不必全程盯着：中途插话纠偏、结论不满意时追问续跑，把精力花在「提好问题、判断好坏」。</div>
+      </div>
+      <div class="row">
+        <div class="n">5</div>
+        <div class="t">结论无缝接入执行</div>
+        <div class="d">一键转意图，讨论积累的背景、研究、权衡随之进入意图细化 —— 从「聊出方向」到「开始开发」没有断层。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>BENEFITS</div>
+      <div>05<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+  <!-- ============ 6: ANATOMY + THREE ROLES ============ -->
+  <section class="anat" data-screen-label="06 Anatomy">
+    <div class="topbar">
+      <div>IN c3</div>
+      <div class="pill">ANATOMY</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">讨论负责「想清楚」，意图负责「做出来」</h1>
+
+    <div class="cols">
+      <div class="panel left">
+        <div class="cap">讨论的构成 · STRUCTURE</div>
+        <div class="frow"><div class="fk">类型<span class="en">type</span></div><div class="fv">Brainstorm / Decision / Review / Planning / Retro</div></div>
+        <div class="frow"><div class="fk">目标<span class="en">goal</span></div><div class="fv">要回答的问题，标题由它派生</div></div>
+        <div class="frow"><div class="fk">上下文<span class="en">context</span></div><div class="fv">你提供的背景，作为原始输入永久保留</div></div>
+        <div class="frow"><div class="fk">研究结果<span class="en">researchResult</span></div><div class="fv">只读研究智能体的现状调研，与上下文分开存放</div></div>
+        <div class="frow"><div class="fk">主持人 / 参与者<span class="en">organizer / participants</span></div><div class="fv">组织者 + 智能体集合（可混合厂商）</div></div>
+        <div class="frow"><div class="fk">议程 / 结论<span class="en">agenda / conclusion</span></div><div class="fv">有序子议题 → 最终产出（可转意图）</div></div>
+        <div class="frow"><div class="fk">状态<span class="en">status</span></div><div class="fv">draft → in_progress → completed / cancelled</div></div>
+      </div>
+      <div class="panel right">
+        <div class="cap">三种角色 · ROLES</div>
+        <div class="role">
+          <div class="rn">主持人 <span class="en">Organizer</span></div>
+          <div class="rd">每轮决策：拆议程、提名发言、广播问题、归纳小结、推进阶段、写结论。即使只有它一个也能「单人深思」。</div>
+        </div>
+        <div class="role">
+          <div class="rn">参与者 <span class="en">Participant</span></div>
+          <div class="rd">被提名或广播时独立发言，只补新观点、不重复；视角差异来自不同模型与配置。</div>
+        </div>
+        <div class="role">
+          <div class="rn">人 <span class="en">Human</span></div>
+          <div class="rd">随时暂停、插话、追问；你的发言进入记录，主持人下一轮就读到。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>ANATOMY</div>
+      <div>06<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+  <!-- ============ 7: LIFECYCLE + INTERVENTIONS ============ -->
+  <section class="flow" data-screen-label="07 Lifecycle">
+    <div class="topbar">
+      <div>THE FLOW</div>
+      <div class="pill">LIFECYCLE</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">只读研究先行，四阶段单向推进，一定会结束</h1>
+
+    <div class="track">
+      <div class="step st1">
+        <div class="t">只读研究</div>
+        <div class="d">读代码 / 检索资料，只产出「事实·现状·约束·待澄清」，不给方案，避免污染。</div>
+      </div>
+      <div class="arw">→</div>
+      <div class="step st2">
+        <div class="t">发散 discuss</div>
+        <div class="d">主持人把子问题并行广播，参与者独立作答，互不干扰。</div>
+      </div>
+      <div class="arw">→</div>
+      <div class="step st3">
+        <div class="t">归纳 → 确认</div>
+        <div class="d">逐个提名发言，串行打磨，向各方确认。</div>
+      </div>
+      <div class="arw">→</div>
+      <div class="step st4">
+        <div class="t">结论 conclude</div>
+        <div class="d">写下结论 → 完成，可转意图 / 继续追问。</div>
+      </div>
+    </div>
+
+    <div class="subcap">人的三种介入方式 · HUMAN IN THE LOOP</div>
+    <div class="ivs">
+      <div class="iv">
+        <div class="ivt">暂停 / 恢复</div>
+        <div class="ivw">进行中</div>
+        <div class="ivd">在轮次边界挂起讨论，恢复后从原地继续。</div>
+      </div>
+      <div class="iv">
+        <div class="ivt">发言</div>
+        <div class="ivw">进行中</div>
+        <div class="ivd">插话进入讨论记录，主持人下一轮据此调整方向。</div>
+      </div>
+      <div class="iv">
+        <div class="ivt">继续</div>
+        <div class="ivw">已完成</div>
+        <div class="ivd">不满意就追问，在完整记录之上续跑、产出新结论。</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>一定会结束</strong>：四阶段<strong>只进不退</strong>保证收敛；每阶段轮次上限（默认 <code>12</code>）+ 整场硬上限（默认 <code>40</code>），触顶写兜底结论，不会无限烧钱。
+    </div>
+
+    <div class="slide-meta">
+      <div>LIFECYCLE</div>
+      <div>07<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+  <!-- ============ 8: CLOSING ============ -->
+  <section class="s8" data-screen-label="08 Closing">
+    <div class="topbar">
+      <div>END OF DECK</div>
+      <div class="pill">FIN.</div>
+    </div>
+
+    <h1 class="h display">随叫随到的<br/>多视角圆桌</h1>
+
+    <p class="strap body">
+      <span class="hl">拿不准方向的大问题，用讨论；方向明确的小事，直接开工。</span><br/>
+      发起后去做别的事，回来看结论；觉得偏了再用「继续」追问一轮 —— 往往比中途干预更省心。
+    </p>
+
+    <div class="stamp" aria-hidden="true">
+      <div class="inner">
+        <div class="num">c3</div>
+        <div class="lbl">Agent<br/>Discussion</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · DISCUSSION</div>
+      <div>08<span class="dot"></span>08</div>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
