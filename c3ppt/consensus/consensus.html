@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>多Agent共识投票 — Multi-agent Consensus</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<!-- Shared Creative Mode design system (tokens, reset, stage, chrome, tables, badge) -->
+<link rel="stylesheet" href="../../templates/creative-mode/share/creative-mode.css">
+<script src="../../templates/creative-mode/share/creative-mode.js"></script>
+<style>
+  /* Deck-specific slide layouts. Common framework lives in
+     ../../templates/creative-mode/share/creative-mode.css */
+
+  /* --- SLIDE 1: TITLE / POSTER (VOTING ROUND TABLE) --- */
+  .s1 .tagline{
+    position:absolute; left:96px; top:150px;
+    font-family:var(--font-mono); font-size:24px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink);
+  }
+  .s1 .tagline span{ display:inline-block; width:60px; height:3px; background:var(--ink); vertical-align:middle; margin-right:18px; transform:translateY(-3px);}
+  .s1 .title{
+    position:absolute; left:96px; top:50%; transform:translateY(-50%);
+    font-size:150px; color:var(--ink); width:940px;
+  }
+  .s1 .title .row{ display:block; }
+  .s1 .footnote{
+    position:absolute; left:96px; bottom:130px;
+    font-family:var(--font-body); font-size:26px; color:var(--ink-2); max-width:900px; line-height:1.5;
+  }
+  .s1 .poster{
+    position:absolute; right:96px; top:140px; bottom:140px; width:760px;
+    background:var(--pink); border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s1 .rt{ position:relative; width:520px; height:520px; }
+  .s1 .rt .table{
+    position:absolute; inset:130px; border:34px solid var(--ink); border-radius:50%;
+    background:var(--yellow); box-shadow:14px 14px 0 var(--orange);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s1 .rt .table .word{ font-family:"Archivo Black"; font-size:44px; letter-spacing:.04em; color:var(--ink); text-align:center; line-height:1.02; }
+  .s1 .rt .table .word small{ display:block; font-family:"Noto Serif SC"; font-weight:900; font-size:24px; letter-spacing:.02em; margin-top:4px; }
+  .s1 .rt .seat{
+    position:absolute; width:118px; height:118px; border:4px solid var(--ink); border-radius:50%;
+    background:var(--cream); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-weight:700; font-size:22px; color:var(--ink); line-height:1;
+  }
+  .s1 .rt .seat .v{ font-family:"Archivo Black"; font-size:30px; margin-top:3px; }
+  .s1 .rt .seat.yes .v{ color:var(--green); }
+  .s1 .rt .seat.no .v{ color:var(--orange); }
+  .s1 .rt .seat.you{ background:var(--green); color:var(--cream); }
+  .s1 .rt .seat.you .v{ font-family:"Noto Serif SC"; font-weight:900; font-size:20px; color:var(--cream); }
+  .s1 .rt .s-a{ left:201px; top:-8px; }
+  .s1 .rt .s-b{ right:-18px; top:120px; }
+  .s1 .rt .s-c{ right:22px; bottom:-4px; }
+  .s1 .rt .s-d{ left:22px; bottom:-4px; }
+  .s1 .rt .s-e{ left:-18px; top:120px; }
+
+  /* --- SLIDE 2: FOUR BURDENS (2x2 CARD GRID) + QUOTE --- */
+  .probs .h{ position:absolute; left:96px; top:112px; right:96px; font-size:54px; line-height:1.08; color:var(--ink); }
+  .probs .grid{ position:absolute; left:96px; right:96px; top:260px; bottom:262px; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:26px; }
+  .probs .card{ border:4px solid var(--ink); box-shadow:12px 12px 0 var(--ink); padding:26px 34px; box-sizing:border-box; display:flex; flex-direction:column; }
+  .probs .card .n{ font-family:"Archivo Black"; font-size:38px; line-height:1; }
+  .probs .card .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:30px; margin:8px 0 12px; line-height:1.18; }
+  .probs .card .d{ font-size:23px; line-height:1.46; color:var(--ink-2); }
+  .probs .c1{ background:var(--pink); }
+  .probs .c2{ background:var(--yellow); }
+  .probs .c3{ background:var(--cream-2); }
+  .probs .c4{ background:var(--orange); color:var(--cream); }
+  .probs .c4 .d{ color:var(--cream); }
+  .probs .quote{ position:absolute; left:96px; right:96px; bottom:118px; font-family:"Noto Serif SC"; font-weight:700; font-size:30px; line-height:1.42; color:var(--ink); border-left:12px solid var(--orange); padding-left:26px; }
+  .probs .quote strong{ font-weight:900; background:var(--yellow); padding:1px 6px; }
+
+  /* --- SLIDE 3: THREE-STEP MECHANISM (STACKED BARS) + COVERAGE --- */
+  .def .h{ position:absolute; left:96px; top:118px; right:96px; font-size:52px; line-height:1.08; color:var(--ink); }
+  .def .stack{ position:absolute; left:96px; right:96px; top:250px; bottom:250px; display:flex; flex-direction:column; justify-content:space-between; }
+  .def .rbar{ flex:1; margin-bottom:20px; border:4px solid var(--ink); box-shadow:10px 10px 0 var(--ink); display:flex; align-items:stretch; background:var(--cream-2); }
+  .def .rbar:last-child{ margin-bottom:0; }
+  .def .rbar .num{ flex:0 0 130px; display:flex; align-items:center; justify-content:center; font-family:"Archivo Black"; font-size:56px; border-right:4px solid var(--ink); background:var(--green); color:var(--cream); }
+  .def .rbar .body{ padding:16px 34px; display:flex; align-items:center; gap:28px; }
+  .def .rbar .t{ flex:0 0 260px; font-family:"Noto Serif SC"; font-weight:900; font-size:30px; line-height:1.14; }
+  .def .rbar .t .en{ display:block; font-family:var(--font-mono); font-weight:400; font-size:17px; color:var(--ink-2); margin-top:5px; letter-spacing:.04em; }
+  .def .rbar .d{ font-size:24px; line-height:1.44; color:var(--ink-2); }
+  .def .cover{ position:absolute; left:96px; right:96px; bottom:118px; border:4px solid var(--ink); background:var(--yellow); box-shadow:10px 10px 0 var(--ink); padding:20px 30px; box-sizing:border-box; font-size:23px; line-height:1.5; color:var(--ink); }
+  .def .cover strong{ font-family:"Noto Serif SC"; font-weight:900; }
+  .def .cover code{ font-family:var(--font-mono); background:var(--cream); border:2px solid var(--ink); padding:1px 8px; font-size:20px; }
+
+  /* --- SLIDE 4: THREE GUARDRAILS (CARDS) + QUOTE --- */
+  .guard .h{ position:absolute; left:96px; top:118px; right:96px; font-size:56px; line-height:1.06; color:var(--ink); }
+  .guard .cards{ position:absolute; left:96px; right:96px; top:290px; bottom:250px; display:grid; grid-template-columns:repeat(3,1fr); gap:30px; }
+  .guard .card{ border:4px solid var(--ink); box-shadow:12px 12px 0 var(--ink); padding:30px 32px; box-sizing:border-box; display:flex; flex-direction:column; }
+  .guard .card .n{ font-family:"Archivo Black"; font-size:64px; line-height:.9; }
+  .guard .card .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:32px; margin:14px 0 16px; line-height:1.2; }
+  .guard .card .d{ font-size:23px; line-height:1.5; color:var(--ink-2); }
+  .guard .g1{ background:var(--pink); }
+  .guard .g2{ background:var(--yellow); }
+  .guard .g3{ background:var(--green); color:var(--cream); }
+  .guard .g3 .d{ color:var(--cream); }
+  .guard .quote{ position:absolute; left:96px; right:96px; bottom:118px; font-family:"Noto Serif SC"; font-weight:700; font-size:32px; line-height:1.42; color:var(--ink); border-left:12px solid var(--orange); padding-left:26px; }
+  .guard .quote strong{ font-weight:900; background:var(--yellow); padding:1px 6px; }
+
+  /* --- SLIDE 5: THREE SWITCHES (TABLE) + TIP --- */
+  .cfg .h{ position:absolute; left:96px; top:118px; right:96px; font-size:54px; line-height:1.06; color:var(--ink); }
+  .cfg .tbl{ top:288px; grid-template-rows:auto repeat(3,1fr); }
+  .cfg .tbl .row{ grid-template-columns:360px 1fr 1fr; }
+  .cfg .tbl .sw{ font-family:"Noto Serif SC"; font-weight:900; font-size:27px; line-height:1.2; background:var(--cream); }
+  .cfg .tbl .sw .num{ font-family:"Archivo Black"; font-size:22px; color:var(--orange); display:block; margin-bottom:6px; }
+  .cfg .tbl .row > div{ font-size:22px; line-height:1.42; align-items:flex-start; padding-top:20px; padding-bottom:20px; }
+  .cfg .tbl .off{ background:var(--cream-2); }
+  .cfg .tbl .on{ background:var(--green); color:var(--cream); }
+  .cfg .tbl .head .col{ font-family:"Noto Serif SC"; font-weight:900; }
+  .cfg .tbl .cellhd{ font-family:"Noto Serif SC"; font-weight:900; font-size:20px; display:block; margin-bottom:6px; letter-spacing:.02em; }
+  .cfg .tbl .off .cellhd{ color:var(--ink); }
+  .cfg .tbl .on .cellhd{ color:var(--yellow); }
+  .cfg .tip{ position:absolute; left:96px; right:96px; bottom:116px; font-size:22px; line-height:1.48; color:var(--ink-2); border-left:10px solid var(--green); padding-left:24px; }
+  .cfg .tip strong{ color:var(--ink); font-family:"Noto Serif SC"; font-weight:900; }
+
+  /* --- SLIDE 6: ROLLOUT PIPELINE (THREE STEPS) --- */
+  .roll .h{ position:absolute; left:96px; top:118px; right:96px; font-size:56px; line-height:1.06; color:var(--ink); }
+  .roll .track{ position:absolute; left:96px; right:96px; top:320px; bottom:210px; display:flex; align-items:stretch; }
+  .roll .step{ flex:1; border:4px solid var(--ink); box-shadow:12px 12px 0 var(--ink); padding:30px 30px; box-sizing:border-box; display:flex; flex-direction:column; }
+  .roll .step .n{ font-family:"Archivo Black"; font-size:56px; line-height:.9; }
+  .roll .step .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:30px; margin:14px 0 16px; line-height:1.16; }
+  .roll .step .d{ font-size:22px; line-height:1.48; }
+  .roll .arw{ flex:0 0 66px; display:flex; align-items:center; justify-content:center; font-family:"Archivo Black"; font-size:52px; color:var(--ink); }
+  .roll .st1{ background:var(--cream-2); }
+  .roll .st2{ background:var(--yellow); }
+  .roll .st3{ background:var(--green); color:var(--cream); }
+  .roll .st3 .d{ color:var(--cream); }
+  .roll .foot{ position:absolute; left:96px; right:96px; bottom:118px; font-size:24px; line-height:1.45; color:var(--ink-2); }
+  .roll .foot strong{ color:var(--ink); font-family:"Noto Serif SC"; font-weight:900; }
+
+  /* --- SLIDE 7: CLOSING / BIG MARK --- */
+  .s7{ background:var(--green) !important; color:var(--cream); }
+  .s7 .topbar, .s7 .slide-meta{ color:var(--cream); }
+  .s7 .topbar .pill{ border-color:var(--cream); }
+  .s7 .slide-meta .dot{ background:var(--cream); }
+  .s7 .h{ position:absolute; left:96px; top:280px; right:600px; font-size:110px; line-height:1.08; color:var(--cream); }
+  .s7 .strap{ position:absolute; left:96px; top:700px; right:600px; font-size:32px; line-height:1.55; }
+  .s7 .strap .hl{ background:var(--yellow); color:var(--ink); padding:2px 8px; }
+  .s7 .stamp{ position:absolute; right:120px; bottom:160px; width:340px; height:340px; background:var(--pink); border:4px solid var(--cream); display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); }
+  .s7 .stamp .inner{ width:280px; height:280px; border:4px solid var(--cream); border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; box-sizing:border-box; }
+  .s7 .stamp .num{ font-family:"Archivo Black"; font-size:64px; line-height:.9; }
+  .s7 .stamp .lbl{ font-family:"Noto Serif SC"; font-weight:700; font-size:23px; letter-spacing:.02em; margin-top:10px;}
+
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- ============ 1: TITLE / POSTER ============ -->
+  <section class="s1" data-screen-label="01 Title">
+    <div class="tagline">
+      <span></span>c3 GUIDE &nbsp;/&nbsp; MULTI-AGENT CONSENSUS
+    </div>
+
+    <div class="title display">
+      <span class="row">多Agent</span>
+      <span class="row" style="color:var(--orange)">共识投票</span>
+    </div>
+
+    <div class="footnote">
+      c3 是一个多 agent 的圆桌。默认每一次有副作用的工具调用、每一道选择题都要<strong>暂停问你</strong>。多智能体共识让<strong>其他 agent 先表决</strong> —— 能自动定的就自动定，定不了才叫你。
+    </div>
+
+    <div class="poster" aria-hidden="true">
+      <div class="rt">
+        <div class="table"><div class="word">VOTE<small>共识放行</small></div></div>
+        <div class="seat s-a yes">A1<span class="v">✓</span></div>
+        <div class="seat s-b yes">A2<span class="v">✓</span></div>
+        <div class="seat s-c yes">A3<span class="v">✓</span></div>
+        <div class="seat s-d you">YOU<span class="v">被解放</span></div>
+        <div class="seat s-e no">A4<span class="v">✗</span></div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · CONSENSUS</div>
+      <div>01<span class="dot"></span>07</div>
+    </div>
+  </section>
+
+  <!-- ============ 2: THE PROBLEM (FOUR BURDENS) ============ -->
+  <section class="probs" data-screen-label="02 Context">
+    <div class="topbar">
+      <div>THE PROBLEM</div>
+      <div class="pill">CONTEXT</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">「人在环中」保证了安全，却常常变成纯粹的负担</h1>
+
+    <div class="grid">
+      <div class="card c1">
+        <div class="n">01</div>
+        <div class="t">你并不关心执行细节</div>
+        <div class="d">要不要跑 bash、装哪个依赖、选 A 还是 B —— 这些是实现层面的琐事，你只想要最终结果，不想被每步打断。</div>
+      </div>
+      <div class="card c2">
+        <div class="n">02</div>
+        <div class="t">你不清楚该怎么决策</div>
+        <div class="d">agent 抛来很专业的选择题（用哪种缓存策略？这个报错要不要忽略？），你并不比它掌握更多信息，硬要拍板反而是瞎猜。</div>
+      </div>
+      <div class="card c3">
+        <div class="n">03</div>
+        <div class="t">大多数时候「推荐选项」就够了</div>
+        <div class="d">agent 的建议八成是对的，你每次只是机械地点「同意」—— 这种确认没产生任何决策价值。</div>
+      </div>
+      <div class="card c4">
+        <div class="n">04</div>
+        <div class="t">你在离开屏幕</div>
+        <div class="d">想让流程在你开会、睡觉时继续推进，而不是卡在一个简单弹窗上干等几个小时。</div>
+      </div>
+    </div>
+
+    <div class="quote">这一步确实需要一个判断，但那个判断<strong>不非得是「你本人」来做</strong> —— 你要的是一个足够可信、又不用你亲自到场的决策来源。</div>
+
+    <div class="slide-meta">
+      <div>CONTEXT</div>
+      <div>02<span class="dot"></span>07</div>
+    </div>
+  </section>
+
+  <!-- ============ 3: THE SOLUTION (THREE STEPS) ============ -->
+  <section class="def" data-screen-label="03 How It Works">
+    <div class="topbar">
+      <div>THE SOLUTION</div>
+      <div class="pill">HOW IT WORKS</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">把请求丢给你之前，先问一圈<span style="color:var(--orange)">其他</span> agent</h1>
+
+    <div class="stack">
+      <div class="rbar">
+        <div class="num">1</div>
+        <div class="body">
+          <div class="t">投票 agent<span class="en">voters</span></div>
+          <div class="d">以一次性、<strong>禁用所有工具</strong>的方式，仅凭最近上下文投出 allow / deny（或选出选项）并附上理由。</div>
+        </div>
+      </div>
+      <div class="rbar">
+        <div class="num">2</div>
+        <div class="body">
+          <div class="t">裁决者<span class="en">decider</span></div>
+          <div class="d">由会话自己的 agent 担任，把大家的意见<strong>汇总成一句话摘要</strong>，作为这一票的最终陈述。</div>
+        </div>
+      </div>
+      <div class="rbar">
+        <div class="num">3</div>
+        <div class="body">
+          <div class="t">决议 / 回落<span class="en">decide or defer</span></div>
+          <div class="d">达成共识 → <strong>自动决议、无需你出面</strong>；达不成 → 回落到你，并把每票和理由一并展示，帮你更快决策。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover">
+      <strong>同一套投票 agent、同一条回落到人的底线</strong>，覆盖三类决策：工具权限 <code>allow/deny</code> ｜ <code>AskUserQuestion</code> 逐题作答 ｜ 自动化编排的检查点（<code>继续</code> 还是 <code>等待</code>人工）。
+    </div>
+
+    <div class="slide-meta">
+      <div>HOW IT WORKS</div>
+      <div>03<span class="dot"></span>07</div>
+    </div>
+  </section>
+
+  <!-- ============ 4: THE GUARDRAILS (THREE) ============ -->
+  <section class="guard" data-screen-label="04 Safety">
+    <div class="topbar">
+      <div>THE GUARDRAILS</div>
+      <div class="pill">SAFETY</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">理解这三条，你才敢放心开</h1>
+
+    <div class="cards">
+      <div class="card g1">
+        <div class="n">01</div>
+        <div class="t">永远可回落到人</div>
+        <div class="d">任何投票出错、超时、无法解析，都记为<b>弃权</b>；弃权就不算一致，这道题重新交回你手上。绝不替你冒险拍板。</div>
+      </div>
+      <div class="card g2">
+        <div class="n">02</div>
+        <div class="t">至少要有一个「别人」</div>
+        <div class="d">如果除会话自己外没有其他 agent 可投票，共识会被<b>跳过</b>，照常问你 —— 不存在自己给自己放行。</div>
+      </div>
+      <div class="card g3">
+        <div class="n">03</div>
+        <div class="t">自动决策留痕可追溯</div>
+        <div class="d">每一次无人参与的自动决议，都在工作台（WorkCenter）的「自动」筛选下留一条<b>仅审计、不阻塞</b>的记录，事后可查。</div>
+      </div>
+    </div>
+
+    <div class="quote">共识只会帮你省掉「能确定的那部分」，<strong>一旦有真正的分歧，方向盘永远还在你手上</strong>。</div>
+
+    <div class="slide-meta">
+      <div>SAFETY</div>
+      <div>04<span class="dot"></span>07</div>
+    </div>
+  </section>
+
+  <!-- ============ 5: THE CONFIG (THREE SWITCHES) ============ -->
+  <section class="cfg" data-screen-label="05 Settings">
+    <div class="topbar">
+      <div>IN c3</div>
+      <div class="pill">SETTINGS</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">三个开关逐层收窄：开不开 → 怎么算通过 → 谁来投</h1>
+
+    <div class="tbl">
+      <div class="row head">
+        <div class="col">开关</div>
+        <div class="col">关闭 · 默认</div>
+        <div class="col">打开 · 更自动</div>
+      </div>
+      <div class="row">
+        <div class="sw"><span class="num">01</span>启用共识投票</div>
+        <div class="off"><span class="cellhd">照旧问你</span>每个敏感调用、每道选择题都直接问你。</div>
+        <div class="on"><span class="cellhd">先投票</span>全体一致才自动决议，否则仍交给你（附各 agent 意见）。</div>
+      </div>
+      <div class="row">
+        <div class="sw"><span class="num">02</span>允许多数决</div>
+        <div class="off"><span class="cellhd">仅全体一致</span>任何分歧、弃权都回落到你。</div>
+        <div class="on"><span class="cellhd">严格多数即决议</span>弃权不计票；但平票 / 无明显多数 / 全体弃权仍交你决定。</div>
+      </div>
+      <div class="row">
+        <div class="sw"><span class="num">03</span>谁来投票</div>
+        <div class="off"><span class="cellhd">全部 agent</span>除会话自己外，每个已启用 agent 都参与。</div>
+        <div class="on"><span class="cellhd">自定义</span>只挑允许投票的子集，仅做缩小；清单为空则跳过共识。</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>投票始终限于会话自身 vendor 的已启用 agent，不同 vendor 永不互投。</strong>多数决还会顺带启用检查点共识：开发循环卡住、或有未答选择题时，同一批 agent 投票决定流程 <code style="font-family:var(--font-mono)">继续</code> 还是 <code style="font-family:var(--font-mono)">等待</code>人工。
+    </div>
+
+    <div class="slide-meta">
+      <div>SETTINGS</div>
+      <div>05<span class="dot"></span>07</div>
+    </div>
+  </section>
+
+  <!-- ============ 6: THE ROLLOUT (THREE STEPS) ============ -->
+  <section class="roll" data-screen-label="06 Rollout">
+    <div class="topbar">
+      <div>ROLLOUT</div>
+      <div class="pill">HOW TO START</div>
+    </div>
+
+    <h1 class="h display" style="font-family:'Noto Serif SC';font-weight:900;">从最保守起步，按需逐层放开</h1>
+
+    <div class="track">
+      <div class="step st1">
+        <div class="n">1</div>
+        <div class="t">先只开总开关<br/>全体一致</div>
+        <div class="d">感受哪些原本要你点确认的操作，现在被「全票通过」自动放行 —— 零风险的自动化红利。有任何分歧，决定权仍在你手里。</div>
+      </div>
+      <div class="arw">→</div>
+      <div class="step st2">
+        <div class="t">需要更快时<br/>叠加多数决</div>
+        <div class="d">当总有一两个 agent 因口味不同拖住全票、而多数意见其实很清晰时，用多数决换更高自动化率；平票和无明显多数仍回到你，底线不丢。</div>
+      </div>
+      <div class="arw">→</div>
+      <div class="step st3">
+        <div class="t">用「自定义」<br/>精修投票团</div>
+        <div class="d">若圆桌里有只读或不专业的 agent 在稀释票池，切到自定义，只保留你信得过的几个 agent。</div>
+      </div>
+    </div>
+
+    <div class="foot">
+      节奏的关键：<strong>先尝零风险红利，再按需换自动化率</strong> —— 每一步放开，都不动摇「有分歧就回落到人」这条底线。
+    </div>
+
+    <div class="slide-meta">
+      <div>HOW TO START</div>
+      <div>06<span class="dot"></span>07</div>
+    </div>
+  </section>
+
+  <!-- ============ 7: CLOSING ============ -->
+  <section class="s7" data-screen-label="07 Closing">
+    <div class="topbar">
+      <div>END OF DECK</div>
+      <div class="pill">FIN.</div>
+    </div>
+
+    <h1 class="h display">能确定的自动定<br/>有分歧的还给你</h1>
+
+    <p class="strap body">
+      <span class="hl">让一屋子 agent 先替你投票 —— 把你从「每一步都要点确认」里解放出来。</span><br/>
+      先只开总开关感受红利，需要更快再叠多数决，最后用自定义精修票团。无论怎么配，那条承诺不变。
+    </p>
+
+    <div class="stamp" aria-hidden="true">
+      <div class="inner">
+        <div class="num">c3</div>
+        <div class="lbl">Multi-agent<br/>Consensus</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>c3 GUIDE · CONSENSUS</div>
+      <div>07<span class="dot"></span>07</div>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
