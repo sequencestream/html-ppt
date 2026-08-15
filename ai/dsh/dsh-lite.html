@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>DeepSeek Harness · 精简版：一套可组合的 Agent Runtime</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<!-- Shared Creative Mode design system (tokens, reset, stage, chrome, tables, badge) -->
+<link rel="stylesheet" href="../../templates/creative-mode/share/creative-mode.css">
+<script src="../../templates/creative-mode/share/creative-mode.js"></script>
+<style>
+  /* ============================================================
+     LITE 版设计说明
+     ------------------------------------------------------------
+     这是 dsh.html 的手机端精简版。原版为桌面/大屏设计，单页信息
+     密度高、含多张多列表格，缩到手机上文字只有几像素高。
+     精简规则：
+       · 每页最多一个论点 + 3~4 个支撑块，不再有第二层级
+       · 所有表格改为并列的大卡片，一格一句话
+       · 正文字号从 19~22px 提到 28~32px，标题从 46px 提到 58px
+       · 一句话控制在 20 字以内，保证卡片里不折成三行
+     公共框架仍来自 ../../templates/creative-mode/share/creative-mode.css
+     ============================================================ */
+
+  /* ---------- 内容框（02–14 页共用） ---------- */
+  .pane{ position:absolute; left:96px; right:96px; top:132px; bottom:104px; display:flex; flex-direction:column; }
+  .pane > .h{
+    font-family:"Noto Serif SC"; font-weight:900; font-size:60px; line-height:1.14;
+    color:var(--ink); margin:0 0 34px;
+  }
+  .pane > .h em{ font-style:normal; color:var(--orange); }
+  .fill{ flex:1; min-height:0; display:flex; flex-direction:column; gap:26px; }
+
+  /* 栅格 */
+  .grid{ display:grid; gap:26px; }
+  .g2{ grid-template-columns:1fr 1fr; }
+  .g3{ grid-template-columns:repeat(3,1fr); }
+  .g4{ grid-template-columns:repeat(4,1fr); }
+  .grow{ flex:1; min-height:0; }
+  .grow .card, .grow .st{ justify-content:center; }
+
+  /* 卡片 */
+  .card{
+    border:4px solid var(--ink); box-shadow:10px 10px 0 var(--ink);
+    background:var(--cream-2); padding:26px 30px; box-sizing:border-box;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .card .k{ font-family:var(--font-mono); font-size:20px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); }
+  .card .t{ font-family:"Noto Serif SC"; font-weight:900; font-size:36px; line-height:1.2; margin:12px 0 14px; }
+  .card .d{ font-size:28px; line-height:1.5; color:var(--ink-2); }
+
+  .c-pink{ background:var(--pink); }
+  .c-yellow{ background:var(--yellow); }
+  .c-cream{ background:var(--cream); }
+  .c-orange{ background:var(--orange); color:var(--cream); }
+  .c-orange .k, .c-orange .d{ color:var(--cream); }
+  .c-green{ background:var(--green); color:var(--cream); }
+  .c-green .k, .c-green .d{ color:var(--cream); }
+
+  /* 行内代码 */
+  code{ font-family:var(--font-mono); font-size:.9em; background:var(--cream); border:2px solid var(--ink); padding:0 8px; color:var(--ink); }
+
+  /* 黄色结论条 */
+  .strip{
+    border:4px solid var(--ink); background:var(--yellow); box-shadow:10px 10px 0 var(--ink);
+    padding:24px 32px; box-sizing:border-box; font-size:32px; line-height:1.4; color:var(--ink);
+  }
+  .strip strong{ font-family:"Noto Serif SC"; font-weight:900; }
+
+  /* 流程行 */
+  .flow{ display:flex; align-items:stretch; }
+  .flow .node{
+    flex:1; border:4px solid var(--ink); background:var(--cream-2); box-sizing:border-box;
+    padding:16px 18px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+  }
+  .flow .node b{ font-family:"Noto Serif SC"; font-weight:900; font-size:30px; line-height:1.2; }
+  .flow .node span{ font-family:var(--font-mono); font-size:19px; letter-spacing:.02em; color:var(--ink-2); margin-top:9px; }
+  .flow .node.on{ background:var(--green); color:var(--cream); }
+  .flow .node.on span{ color:var(--yellow); }
+  .flow .node.hi{ background:var(--yellow); }
+  .flow .arw{ flex:0 0 46px; display:flex; align-items:center; justify-content:center; font-family:"Archivo Black"; font-size:34px; color:var(--ink); }
+
+  /* 大字号要点表 */
+  .ul{ list-style:none; margin:0; padding:0; }
+  .ul li{ position:relative; padding-left:36px; font-size:32px; line-height:1.42; color:var(--ink-2); margin-bottom:26px; }
+  .ul li:last-child{ margin-bottom:0; }
+  .ul li::before{ content:""; position:absolute; left:0; top:14px; width:16px; height:16px; background:var(--orange); }
+  .ul li strong{ font-family:"Noto Serif SC"; font-weight:900; color:var(--ink); }
+
+  .eyebrow{
+    font-family:var(--font-mono); font-size:21px; letter-spacing:.12em; text-transform:uppercase;
+    background:var(--ink); color:var(--cream); display:inline-block; padding:8px 18px; margin-bottom:22px;
+  }
+
+  /* 对照条：左标签 + 右一句话，替代原版的多列表格 */
+  .rows{ display:flex; flex-direction:column; gap:18px; }
+  .rows .r{
+    flex:1; border:4px solid var(--ink); background:var(--cream-2); box-sizing:border-box;
+    display:flex; align-items:center; gap:28px; padding:0 30px;
+  }
+  .rows .r b{ font-family:"Noto Serif SC"; font-weight:900; font-size:32px; flex:0 0 380px; line-height:1.2; }
+  .rows .r span{ font-size:29px; line-height:1.38; color:var(--ink-2); }
+  .rows .r.hi{ background:var(--yellow); }
+  .rows .r.on{ background:var(--green); color:var(--cream); }
+  .rows .r.on span{ color:var(--cream); }
+  .rows .r.pk{ background:var(--pink); }
+
+  /* ============ 1: 封面 ============ */
+  .s1 .tagline{
+    position:absolute; left:96px; top:150px;
+    font-family:var(--font-mono); font-size:24px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink);
+  }
+  .s1 .tagline span{ display:inline-block; width:60px; height:3px; background:var(--ink); vertical-align:middle; margin-right:18px; transform:translateY(-3px); }
+  .s1 .title{ position:absolute; left:96px; top:250px; width:900px; font-size:110px; color:var(--ink); }
+  .s1 .title .row{ display:block; }
+  .s1 .sub{
+    position:absolute; left:96px; top:480px; width:880px;
+    font-family:"Noto Serif SC"; font-weight:900; font-size:46px; line-height:1.28; color:var(--orange);
+  }
+  .s1 .thesis{
+    position:absolute; left:96px; top:640px; width:880px;
+    font-size:30px; line-height:1.5; color:var(--ink-2);
+    border-left:12px solid var(--green); padding-left:26px; box-sizing:border-box;
+  }
+  .s1 .poster{
+    position:absolute; right:96px; top:150px; bottom:130px; width:800px;
+    background:var(--pink); border:4px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s1 .fig{ position:relative; width:560px; height:560px; }
+  .s1 .core{
+    position:absolute; left:160px; top:190px; width:240px; height:180px; box-sizing:border-box;
+    background:var(--yellow); border:4px solid var(--ink); box-shadow:14px 14px 0 var(--orange);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  }
+  .s1 .core b{ font-family:"Archivo Black"; font-size:36px; line-height:1; letter-spacing:.02em; }
+  .s1 .core small{ font-family:"Noto Serif SC"; font-weight:900; font-size:22px; margin-top:8px; }
+  .s1 .plug{
+    position:absolute; box-sizing:border-box; border:4px solid var(--ink); background:var(--cream);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    font-family:var(--font-mono); font-size:18px; letter-spacing:.04em; line-height:1.25; color:var(--ink);
+  }
+  .s1 .plug small{ font-family:"Noto Serif SC"; font-weight:900; font-size:16px; margin-top:5px; letter-spacing:0; }
+  .s1 .p-n{ left:205px; top:20px; width:150px; height:104px; background:var(--cream); }
+  .s1 .p-s{ left:205px; top:436px; width:150px; height:104px; background:var(--cream-2); }
+  .s1 .p-w{ left:0; top:228px; width:130px; height:104px; background:var(--yellow); }
+  .s1 .p-e{ left:430px; top:228px; width:130px; height:104px; background:var(--green); color:var(--cream); }
+  .s1 .wire{ position:absolute; background:var(--ink); }
+  .s1 .w-n{ left:276px; top:124px; width:8px; height:66px; }
+  .s1 .w-s{ left:276px; top:370px; width:8px; height:66px; }
+  .s1 .w-w{ left:130px; top:276px; width:30px; height:8px; }
+  .s1 .w-e{ left:400px; top:276px; width:30px; height:8px; }
+  .s1 .swap{
+    position:absolute; right:-6px; top:130px;
+    background:var(--cream); border:4px solid var(--ink); padding:10px 16px;
+    font-family:"Archivo Black"; font-size:22px; letter-spacing:.04em; transform:rotate(-6deg);
+  }
+
+  /* ============ 各页微调 ============ */
+  .s3 .rows{ flex:1; }
+  .s5 .grid{ height:300px; }
+  .s6 .split{ display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+  /* pre 内容必须是单个 flex item，否则 <span> 会被拆成独立的行盒、破坏 white-space:pre */
+  .s6 .code{
+    background:var(--ink); border:4px solid var(--ink); box-shadow:10px 10px 0 var(--orange);
+    padding:32px 34px; box-sizing:border-box; display:flex; align-items:center;
+  }
+  .s6 .code .pre{
+    font-family:var(--font-mono); font-size:26px; line-height:1.75; white-space:pre; color:var(--cream);
+  }
+  .s6 .code .cm{ color:var(--yellow); }
+  .s6 .right{ display:flex; flex-direction:column; gap:22px; }
+  .s6 .right .card{ flex:1; }
+  .s7 .st{
+    border:4px solid var(--ink); box-shadow:10px 10px 0 var(--ink); padding:26px 28px; box-sizing:border-box;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .s7 .st b{ font-family:"Noto Serif SC"; font-weight:900; font-size:34px; line-height:1.2; }
+  .s7 .st p{ margin:14px 0 0; font-size:27px; line-height:1.45; color:var(--ink-2); }
+  .s7 .st.a{ background:var(--cream-2); }
+  .s7 .st.b{ background:var(--pink); }
+  .s7 .st.c{ background:var(--yellow); }
+  .s7 .st.d{ background:var(--green); color:var(--cream); }
+  .s7 .st.d p{ color:var(--cream); }
+  .s8 .split{ display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+  .s8 .stackd{ display:flex; flex-direction:column; gap:14px; }
+  .s8 .layer{
+    flex:1; border:4px solid var(--ink); background:var(--cream-2); box-sizing:border-box;
+    padding:0 28px; display:flex; flex-direction:column; justify-content:center;
+  }
+  .s8 .layer strong{ font-family:"Archivo Black"; font-size:26px; letter-spacing:.04em; }
+  .s8 .layer span{ font-size:24px; line-height:1.3; color:var(--ink-2); margin-top:6px; }
+  .s8 .layer.l3{ background:var(--yellow); }
+  .s8 .layer.l4{ background:var(--pink); }
+  .s8 .layer.l6{ background:var(--green); color:var(--cream); }
+  .s8 .layer.l6 span{ color:var(--cream); }
+  .s8 .right{ display:flex; flex-direction:column; gap:22px; }
+  .s8 .right .card{ flex:1; }
+  .s9 .hero{
+    border:4px solid var(--ink); background:var(--yellow); box-shadow:12px 12px 0 var(--ink);
+    padding:28px 34px; box-sizing:border-box;
+    font-family:"Noto Serif SC"; font-weight:900; font-size:38px; line-height:1.34; color:var(--ink);
+  }
+  .s9 .flow{ height:150px; }
+  .s10 .flow{ height:150px; }
+  .s11 .flow{ height:150px; }
+  .s12 .flow{ height:140px; }
+  .s14 .flow{ height:140px; }
+  .s14 .split{ display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+  .s14 .box{
+    border:4px solid var(--ink); background:var(--cream-2); box-shadow:10px 10px 0 var(--ink);
+    padding:26px 32px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:center;
+  }
+  .s14 .box.risk{ background:var(--pink); }
+
+  /* ============ 15: 收束 ============ */
+  .s15{ background:var(--green) !important; color:var(--cream); }
+  .s15 .topbar, .s15 .slide-meta{ color:var(--cream); }
+  .s15 .topbar .pill{ border-color:var(--cream); }
+  .s15 .slide-meta .dot{ background:var(--cream); }
+  .s15 .h{ position:absolute; left:96px; top:186px; width:820px; font-size:88px; line-height:1.08; color:var(--cream); }
+  .s15 .strap{ position:absolute; left:96px; top:540px; width:820px; font-size:30px; line-height:1.9; color:var(--cream); margin:0; }
+  .s15 .strap .hl{ background:var(--yellow); color:var(--ink); padding:5px 12px; }
+  .s15 .stamp{
+    position:absolute; left:96px; bottom:110px; width:260px; height:260px;
+    background:var(--pink); border:4px solid var(--cream);
+    display:flex; align-items:center; justify-content:center; transform:rotate(-6deg);
+  }
+  .s15 .stamp .inner{
+    width:220px; height:220px; border:4px solid var(--cream); border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:16px; box-sizing:border-box;
+  }
+  .s15 .stamp .num{ font-family:"Archivo Black"; font-size:46px; line-height:.95; }
+  .s15 .stamp .lbl{ font-family:"Noto Serif SC"; font-weight:700; font-size:20px; margin-top:10px; line-height:1.3; }
+  .s15 .trends{ position:absolute; right:96px; top:180px; bottom:120px; width:830px; display:flex; flex-direction:column; gap:22px; }
+  .s15 .trend{ flex:1; border:3px solid var(--cream); padding:22px 28px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:center; }
+  .s15 .trend b{ font-family:"Noto Serif SC"; font-weight:900; font-size:34px; }
+  .s15 .trend span{ font-size:27px; line-height:1.4; margin-top:10px; color:var(--cream); }
+  .s15 .final{
+    border:4px solid var(--ink); background:var(--yellow); color:var(--ink);
+    padding:24px 30px; box-sizing:border-box; font-size:29px; line-height:1.45;
+  }
+  .s15 .final strong{ font-family:"Noto Serif SC"; font-weight:900; }
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- ============ 1: 封面 ============ -->
+  <section class="s1" data-screen-label="01 Cover">
+    <div class="tagline">
+      <span></span>DEEPSEEK HARNESS &nbsp;/&nbsp; 精简版
+    </div>
+
+    <div class="title display">
+      <span class="row">DeepSeek</span>
+      <span class="row">Harness</span>
+    </div>
+
+    <div class="sub">一套可组合的<br>Agent Runtime</div>
+
+    <div class="thesis">
+      Coding Agent 只是它的第一个应用。<br>
+      它真正回答的是：运行中换件之后，副作用能否撤销、依赖能否协调、会话能否回放。
+    </div>
+
+    <div class="poster" aria-hidden="true">
+      <div class="fig">
+        <div class="core"><b>RUNTIME</b><small>可组合运行时</small></div>
+        <div class="wire w-n"></div><div class="wire w-s"></div>
+        <div class="wire w-w"></div><div class="wire w-e"></div>
+        <div class="plug p-n">FS / SHELL<small>能力层</small></div>
+        <div class="plug p-s">SESSION LOG<small>事件日志</small></div>
+        <div class="plug p-w">SANDBOX<small>控制层</small></div>
+        <div class="plug p-e">LLM<small>可替换</small></div>
+        <div class="swap">HOT SWAP</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>DSH LITE · COVER</div>
+      <div>01<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 2: 市场背景 ============ -->
+  <section class="s2" data-screen-label="02 Context">
+    <div class="topbar">
+      <div>市场背景</div>
+      <div class="pill">HARNESS ENGINEERING</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">模型决定上限，<em>Harness</em> 决定能否接近上限</h1>
+      <div class="fill">
+        <div class="grid g3 grow">
+          <div class="card c-pink"><div class="k">Driver 01</div><div class="t">模型能力趋近</div><div class="d">差异转向上下文装配与执行质量。</div></div>
+          <div class="card c-yellow"><div class="k">Driver 02</div><div class="t">任务周期拉长</div><div class="d">状态一致、恢复与错误归因成为主问题。</div></div>
+          <div class="card c-green"><div class="k">Driver 03</div><div class="t">企业场景分化</div><div class="d">需要按数据域与风险等级组合能力。</div></div>
+        </div>
+        <div class="strip">焦点正从 Prompt、Context 移动到 <strong>Harness Engineering</strong>。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>CONTEXT</div>
+      <div>02<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 3: 市场地图 ============ -->
+  <section class="s3" data-screen-label="03 Positioning">
+    <div class="topbar">
+      <div>市场地图</div>
+      <div class="pill">POSITIONING</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">四类玩家，各有一个<em>过不去的约束</em></h1>
+      <div class="fill">
+        <div class="rows grow">
+          <div class="r"><b>一体化 Coding Agent</b><span>体验完整，但核心循环不能替换</span></div>
+          <div class="r pk"><b>Agent Framework</b><span>生态丰富，但产品边界要自己装配</span></div>
+          <div class="r hi"><b>Runtime / 平台</b><span>持久执行强，但平台绑定成本高</span></div>
+          <div class="r on"><b>开源 Coding Harness</b><span>可改可私有，但生命周期语义不统一</span></div>
+        </div>
+        <div class="strip">dsh 从第四类起步，<strong>向可重组的 Agent Runtime 延伸</strong>。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>POSITIONING</div>
+      <div>03<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 4: 产品定位 ============ -->
+  <section class="s4" data-screen-label="04 Product Position">
+    <div class="topbar">
+      <div>产品定位</div>
+      <div class="pill">EVERYTHING IS A PLUGIN</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">Coding Agent 只是这套 Runtime 的<em>第一位客户</em></h1>
+      <div class="fill">
+        <div class="strip">Loop、Session、LLM、沙箱、审批 —— <strong>全都是插件</strong>。</div>
+        <div class="grid g4 grow">
+          <div class="card"><div class="k">Preset</div><div class="t">standard</div><div class="d">完整 Coding Agent</div></div>
+          <div class="card c-pink"><div class="k">Preset</div><div class="t">code</div><div class="d">用 TypeScript 编排工具</div></div>
+          <div class="card c-yellow"><div class="k">Preset</div><div class="t">minimal</div><div class="d">最小工具面，跑基准</div></div>
+          <div class="card c-green"><div class="k">Preset</div><div class="t">cordis</div><div class="d">高权限创造模式</div></div>
+        </div>
+        <div class="strip">注意：<strong>cordis 不等于已经安全的自演化</strong>。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>EVERYTHING IS A PLUGIN</div>
+      <div>04<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 5: 核心难题 ============ -->
+  <section class="s5" data-screen-label="05 Core Problem">
+    <div class="topbar">
+      <div>核心难题</div>
+      <div class="pill">SAFE RECOMPOSITION</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">难的不是加载插件，而是<em>安全地换件</em></h1>
+      <div class="fill">
+        <div class="grid g3">
+          <div class="card c-pink"><div class="k">01 / Teardown</div><div class="t">副作用能撤销吗</div><div class="d">监听器、定时器、句柄要全回收。</div></div>
+          <div class="card c-yellow"><div class="k">02 / Dependency</div><div class="t">依赖变了怎么办</div><div class="d">下游要自动停用、重载、恢复。</div></div>
+          <div class="card c-orange"><div class="k">03 / Continuity</div><div class="t">能不重启进程吗</div><div class="d">会话与本地状态要保持连续。</div></div>
+        </div>
+        <div class="grid g2 grow">
+          <div class="card c-green"><div class="k">时间可组合性</div><div class="t">Revertible Effects</div><div class="d">组件移除后，改动能完整撤销。</div></div>
+          <div class="card c-green"><div class="k">空间可组合性</div><div class="t">Reactive Coeffects</div><div class="d">依赖出现、消失、替换都被响应。</div></div>
+        </div>
+        <div class="strip">动态重组 = <strong>副作用回收 + 依赖协调 + 状态一致</strong>。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>SAFE RECOMPOSITION</div>
+      <div>05<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 6: 可撤销副作用 ============ -->
+  <section class="s6" data-screen-label="06 Revertible Effects">
+    <div class="topbar">
+      <div>Cordis 原理一</div>
+      <div class="pill">REVERTIBLE EFFECTS</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">副作用必须<em>自带逆操作</em></h1>
+      <div class="fill">
+        <div class="split grow">
+          <div class="code"><span class="pre">ctx.effect(() =&gt; {
+  const t = setInterval(fn, 1000)
+  <span class="cm">return</span> () =&gt; clearInterval(t)
+})</span></div>
+          <div class="right">
+            <div class="card c-pink"><div class="t">创建与撤销写在一起</div><div class="d">卸载时按后进先出回收，父插件可级联收回子插件资源。</div></div>
+            <div class="card c-orange"><div class="t">但这不等于回滚正确</div><div class="d">绕过 Context 写数据库和文件，仍要靠事务、幂等与补偿。</div></div>
+          </div>
+        </div>
+        <div class="flow" style="height:140px;">
+          <div class="node"><b>创建</b><span>注册副作用</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>记录</b><span>保存 disposer</span></div>
+          <div class="arw">→</div>
+          <div class="node on"><b>卸载</b><span>LIFO 回收</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>REVERTIBLE EFFECTS</div>
+      <div>06<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 7: 响应式依赖 ============ -->
+  <section class="s7" data-screen-label="07 Reactive Coeffects">
+    <div class="topbar">
+      <div>Cordis 原理二</div>
+      <div class="pill">REACTIVE COEFFECTS</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">依赖变化，直接驱动<em>组件生命周期</em></h1>
+      <div class="fill">
+        <div class="grid g4 grow">
+          <div class="st a"><b>依赖齐备</b><p>自动激活，不用人工排启动顺序。</p></div>
+          <div class="st b"><b>provider 消失</b><p>消费方停用，不再调用失效服务。</p></div>
+          <div class="st c"><b>provider 替换</b><p>消费方重载，重新绑定新实现。</p></div>
+          <div class="st d"><b>provider 卸载</b><p>先停服务，等下游收尾，再回收自身。</p></div>
+        </div>
+        <div class="strip">普通 DI 启动时解析一次；这里的依赖解析是<strong>持续的运行时过程</strong>。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>REACTIVE COEFFECTS</div>
+      <div>07<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 8: 总体架构 ============ -->
+  <section class="s8" data-screen-label="08 Architecture">
+    <div class="topbar">
+      <div>总体架构</div>
+      <div class="pill">LAYERED COMPOSITION</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">从产品入口到底层能力，<em>全在一张组合图上</em></h1>
+      <div class="fill">
+        <div class="split grow">
+          <div class="stackd">
+            <div class="layer l1"><strong>ENTRY</strong><span>Web UI / CLI / SDK</span></div>
+            <div class="layer l3"><strong>COMPOSITION</strong><span>Profile → Bundle → Cordis Context</span></div>
+            <div class="layer l4"><strong>AGENT CORE</strong><span>Loop / Session / Prompt / Tools / LLM</span></div>
+            <div class="layer l5"><strong>CAPABILITIES</strong><span>FS / Shell / MCP / Skills / Subagent</span></div>
+            <div class="layer l6"><strong>CONTROL</strong><span>Sandbox / Approval / Persistence</span></div>
+          </div>
+          <div class="right">
+            <div class="card c-yellow"><div class="t">配置逐层 overlay</div><div class="d">按 row id 直接替换文件系统、沙箱、LLM adapter 或会话后端。</div></div>
+            <div class="card c-green"><div class="t">不必改 Agent Loop</div><div class="d">产品能力没有传统意义上的特权核心。</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>ARCHITECTURE</div>
+      <div>08<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 9: 会话模型 ============ -->
+  <section class="s9" data-screen-label="09 Session Model">
+    <div class="topbar">
+      <div>会话模型</div>
+      <div class="pill">MODEL-VISIBLE MEANS LOGGED</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">事件日志是模型历史的<em>唯一真源</em></h1>
+      <div class="fill">
+        <div class="hero">不变量：凡是模型可见的内容，都必须能从日志重建。</div>
+        <div class="grid g2 grow">
+          <div class="card c-pink"><div class="k">Benefit</div><div class="t">实时与回放同源</div><div class="d">失败轨迹可审计，fork 与恢复按事件边界构造。</div></div>
+          <div class="card c-orange"><div class="k">Cost</div><div class="t">schema 必须严格</div><div class="d">解释不了的日志会被拒绝，而不是静默忽略。</div></div>
+        </div>
+        <div class="flow">
+          <div class="node hi"><b>Event Log</b><span>append-only</span></div>
+          <div class="arw">→</div>
+          <div class="node"><b>投影</b><span>deriveMessages()</span></div>
+          <div class="arw">→</div>
+          <div class="node on"><b>回放 / 审计</b><span>same semantics</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>SESSION MODEL</div>
+      <div>09<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 10: Agent Loop ============ -->
+  <section class="s10" data-screen-label="10 Agent Loop">
+    <div class="topbar">
+      <div>Agent Loop</div>
+      <div class="pill">TURN / STEP / INPUT</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">把介入方式<em>拆成明确语义</em></h1>
+      <div class="fill">
+        <div class="strip"><strong>Step</strong> 是一次模型请求；<strong>Turn</strong> 是一次用户输入的完整处理。</div>
+        <div class="flow">
+          <div class="node"><b>取输入</b><span>turn/start</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>装配</b><span>pre-step</span></div>
+          <div class="arw">→</div>
+          <div class="node"><b>模型流</b><span>assistant</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>工具</b><span>call / result</span></div>
+          <div class="arw">→</div>
+          <div class="node on"><b>继续或结束</b><span>turn/end</span></div>
+        </div>
+        <div class="grid g3 grow">
+          <div class="card c-pink"><div class="k">Followup</div><div class="t">排下一个 Turn</div><div class="d">并唤醒空闲的 Agent。</div></div>
+          <div class="card c-yellow"><div class="k">Steer</div><div class="t">最近 Step 边界介入</div><div class="d">运行中或空闲都能触发。</div></div>
+          <div class="card c-green"><div class="k">Inject</div><div class="t">只注入上下文</div><div class="d">不主动唤醒 Agent。</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>AGENT LOOP</div>
+      <div>10<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 11: 工具系统 ============ -->
+  <section class="s11" data-screen-label="11 Tool Pipeline">
+    <div class="topbar">
+      <div>工具系统</div>
+      <div class="pill">POLICY PIPELINE</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">工具执行是一条<em>受控策略管线</em></h1>
+      <div class="fill">
+        <div class="flow">
+          <div class="node"><b>pre-execute</b><span>策略入口</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>权限守卫</b><span>只收紧</span></div>
+          <div class="arw">→</div>
+          <div class="node"><b>execute</b><span>工具实现</span></div>
+          <div class="arw">→</div>
+          <div class="node on"><b>finalize</b><span>不可变结果</span></div>
+        </div>
+        <div class="grid g3 grow">
+          <div class="card c-pink"><div class="t">策略可插拔</div><div class="d">允许 / 拒绝 / 询问、沙箱、超时、裁剪、审计。</div></div>
+          <div class="card c-yellow"><div class="t">并发默认保守</div><div class="d">只有显式声明安全的调用才并行，写入顺序不变。</div></div>
+          <div class="card c-orange"><div class="t">逻辑权限≠隔离</div><div class="d">不可信代码必须移出进程：容器、microVM、WASM。</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>POLICY PIPELINE</div>
+      <div>11<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 12: 能力闭环 ============ -->
+  <section class="s12" data-screen-label="12 Capability Loop">
+    <div class="topbar">
+      <div>关键能力</div>
+      <div class="pill">CLOSED LOOP</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">四项能力开始<em>形成闭环</em></h1>
+      <div class="fill">
+        <div class="flow">
+          <div class="node"><b>可修改</b><span>Runtime</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>可撤销</b><span>Effects</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>依赖自协调</b><span>Coeffects</span></div>
+          <div class="arw">→</div>
+          <div class="node on"><b>可回放</b><span>Event Log</span></div>
+          <div class="arw">→</div>
+          <div class="node" style="background:var(--cream);"><b>Eval 验证</b><span>尚未闭合</span></div>
+        </div>
+        <div class="grid g3 grow">
+          <div class="card c-pink"><div class="t">Agent 级组合</div><div class="d">同进程承载多种 Agent，互不污染。</div></div>
+          <div class="card c-yellow"><div class="t">能力接缝</div><div class="d">本地文件系统换远端沙箱，不必 fork 消费方。</div></div>
+          <div class="card c-green"><div class="t">Code Mode</div><div class="d">用 TypeScript 编排多次工具调用，降低往返。</div></div>
+        </div>
+        <div class="strip">最后一环 —— <strong>用 Eval 验证修改</strong> —— 目前仍未工程化。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>CLOSED LOOP</div>
+      <div>12<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 13: 竞品关系 ============ -->
+  <section class="s13" data-screen-label="13 Competition">
+    <div class="topbar">
+      <div>竞品关系</div>
+      <div class="pill">BOUNDARY COMPETITION</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">竞争单位从「哪个 Agent 强」转向<em>「哪个 Runtime 会组合」</em></h1>
+      <div class="fill">
+        <div class="grid g3 grow">
+          <div class="card c-pink"><div class="k">Claude Code</div><div class="t">体验成熟</div><div class="d">dsh 的压力点：插件的作用域、撤销与依赖生命周期。</div></div>
+          <div class="card c-yellow"><div class="k">Codex</div><div class="t">治理成熟</div><div class="d">企业仍会要求替换持久化、策略与 worker。</div></div>
+          <div class="card c-green"><div class="k">LangGraph</div><div class="t">更像互补</div><div class="d">它管业务 Graph，Cordis 管运行 Graph 的组件。</div></div>
+        </div>
+        <div class="strip">事实上，<strong>Claude Code 和 Codex 已能作为 dsh 的 subagent</strong>。</div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>BOUNDARY COMPETITION</div>
+      <div>13<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 14: 企业采用 ============ -->
+  <section class="s14" data-screen-label="14 Enterprise">
+    <div class="topbar">
+      <div>企业采用</div>
+      <div class="pill">CONTROLLED PILOT</div>
+    </div>
+
+    <div class="pane">
+      <h1 class="h">适合受控试点，<em>不适合直接开放自修改</em></h1>
+      <div class="fill">
+        <div class="split grow">
+          <div class="box">
+            <div class="eyebrow">机会</div>
+            <ul class="ul">
+              <li>换 LLM adapter，降低模型锁定</li>
+              <li>用 Preset 组合出风险分级的 Agent</li>
+              <li>审批与审计沉淀为版本化插件</li>
+              <li>逐步替换文件系统与持久化实现</li>
+            </ul>
+          </div>
+          <div class="box risk">
+            <div class="eyebrow">风险</div>
+            <ul class="ul">
+              <li>Preview 阶段的破坏性变化</li>
+              <li>插件拥有进程内权限，供应链风险</li>
+              <li>逻辑权限隔离不了恶意代码</li>
+              <li>disposer 覆盖不了外部副作用</li>
+            </ul>
+          </div>
+        </div>
+        <div class="flow">
+          <div class="node"><b>测试仓库</b><span>受控试点</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>最小 Profile</b><span>收敛能力面</span></div>
+          <div class="arw">→</div>
+          <div class="node hi"><b>策略插件</b><span>审批与审计</span></div>
+          <div class="arw">→</div>
+          <div class="node on"><b>Harness Eval</b><span>故障注入</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-meta">
+      <div>CONTROLLED PILOT</div>
+      <div>14<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+  <!-- ============ 15: 收束 ============ -->
+  <section class="s15" data-screen-label="15 Closing">
+    <div class="topbar">
+      <div>CONCLUSION / TREND</div>
+      <div class="pill">FIN.</div>
+    </div>
+
+    <h1 class="h display">Agent Runtime<br>成为独立<br>工程对象</h1>
+
+    <p class="strap body">
+      <span class="hl">更强的模型已经不够，</span><br>
+      <span class="hl">还要能安全演进自己的 Harness。</span>
+    </p>
+
+    <div class="stamp" aria-hidden="true">
+      <div class="inner">
+        <div class="num">DSH</div>
+        <div class="lbl">Composable<br>Agent Runtime</div>
+      </div>
+    </div>
+
+    <div class="trends">
+      <div class="trend"><b>独立度量</b><span>Harness 将有自己的版本、benchmark 与安全指标。</span></div>
+      <div class="trend"><b>组件契约</b><span>插件要携带权限、副作用、补偿与 Eval 契约。</span></div>
+      <div class="trend"><b>渐进自演化</b><span>生成 → shadow run → Eval → canary → 上线。</span></div>
+      <div class="final">它还不能证明谁会被取代，但已经把问题推到新一层：Runtime 必须<strong>可组合、可恢复、可审计、可评估</strong>。</div>
+    </div>
+
+    <div class="slide-meta">
+      <div>DSH LITE · CONCLUSION</div>
+      <div>15<span class="dot"></span>15</div>
+    </div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
