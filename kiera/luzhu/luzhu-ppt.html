@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>露珠 · 水美好生活创富商业计划</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Self-hosted fonts (no fonts.googleapis.com / fonts.gstatic.com dependency —
+     see templates/cobalt-grid/share/fonts/fonts.css for why). -->
+<link rel="stylesheet" href="../../templates/cobalt-grid/share/fonts/fonts.css" />
+<!-- Shared Cobalt Grid design system (tokens, reset, stage, grid backdrop,
+     type system, hairlines / page-number / nav-hint chrome, pixel-glitch +
+     QR-block decorations). -->
+<link rel="stylesheet" href="../../templates/cobalt-grid/share/cobalt-grid.css" />
+<script src="../../templates/cobalt-grid/share/cobalt-grid.js"></script>
+<style>
+  /* Deck-specific layouts. Shared framework lives in
+     ../../templates/cobalt-grid/share/cobalt-grid.css — this block re-uses
+     several of the demo template's own slide types (cover / manifesto /
+     index / chapter / data / quote / table / colophon) verbatim, and adds
+     the handful of new layouts this 23-page business deck needed (value
+     cards, entity ledger, photo gallery, step flow, tag list / strip,
+     stat strip) built from the same tokens, fonts and spacing rhythm. */
+
+  /* ──────────────────────────────────────────────────────────────
+     GENERIC CONTENT FRAME — topbar + body, reused by most new slides
+     ────────────────────────────────────────────────────────────── */
+  .frame {
+    position: absolute;
+    inset: clamp(76px, 8vh, 130px) clamp(36px, 3.6vw, 80px) clamp(100px, 10vh, 150px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(30px, 3.6vh, 56px);
+    z-index: 5;
+  }
+  .topbar {
+    display: flex; align-items: end; justify-content: space-between;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: clamp(14px, 1.6vh, 24px);
+    gap: 30px; flex: 0 0 auto;
+  }
+  .topbar .h {
+    font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(50px, min(5.6vw, 9.6vh), 108px);
+    line-height: 0.98; color: var(--ink);
+  }
+  .topbar .lab-tag {
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    font-size: clamp(13px, 1vw, 16px); color: var(--ink); text-align: right;
+  }
+  .lede {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: clamp(20px, 1.5vw, 27px);
+    line-height: 1.6; color: var(--ink); max-width: 78ch;
+  }
+  .kicker {
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.2em;
+    font-size: clamp(14px, 1.05vw, 17px); color: var(--ink);
+  }
+  .headline-stmt {
+    font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(42px, min(4.8vw, 8.4vh), 78px);
+    line-height: 1.22; color: var(--ink); max-width: 58ch;
+  }
+  .note {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: clamp(14px, 1vw, 17px);
+    line-height: 1.55; color: var(--ink); opacity: 0.72; max-width: 84ch;
+  }
+
+  /* ──────────────────────────────────────────────────────────────
+     GENERIC NUMBERED LIST (single column) — entity ledger, membership
+     benefits, credential rows, etc.
+     ────────────────────────────────────────────────────────────── */
+  .list { display: grid; gap: clamp(20px, 2.8vh, 34px); }
+  .list.cols-1 { grid-template-columns: 1fr; }
+  .row {
+    display: grid; grid-template-columns: 64px 1fr; align-items: start;
+    gap: clamp(14px, 1.6vw, 26px);
+    min-height: clamp(64px, 8vh, 116px);
+    border-bottom: 1px solid rgba(31, 43, 224, 0.18);
+    padding-bottom: clamp(14px, 1.8vh, 26px);
+  }
+  .row .num-tag {
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: clamp(14px, 1vw, 17px); color: var(--ink);
+    letter-spacing: 0.04em; padding-top: 6px;
+  }
+  .row h3 {
+    margin: 0 0 7px; font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(27px, 2.3vw, 42px); line-height: 1.1; color: var(--ink);
+  }
+  .row p {
+    margin: 0; font-family: 'Hanken Grotesk', sans-serif;
+    font-size: clamp(16px, 1.15vw, 19.5px); line-height: 1.5; color: var(--ink); max-width: 96%;
+  }
+
+  /* ──────────────────────────────────────────────────────────────
+     CARDS — value props, pain/solution pairs, academy pillars, invest
+     terms, module columns
+     ────────────────────────────────────────────────────────────── */
+  .cards { display: grid; gap: clamp(26px, 3vw, 54px); }
+  .cards.n2 { grid-template-columns: 1fr 1fr; }
+  .cards.n3 { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    border-top: 1.5px solid var(--ink); padding-top: clamp(16px, 1.8vh, 26px);
+    display: flex; flex-direction: column; gap: 14px;
+    min-height: clamp(120px, 14vh, 200px);
+  }
+  .card .card-tag {
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.16em; font-size: clamp(13px, 0.95vw, 16px); color: var(--ink);
+  }
+  .card .card-title {
+    font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(34px, 2.8vw, 54px); line-height: 1.12; color: var(--ink);
+  }
+  .card.stat .card-title { font-size: clamp(64px, 6.2vw, 116px); line-height: 1; margin: 4px 0; }
+  .card .card-body { margin: 0; font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(16px, 1.15vw, 19.5px); line-height: 1.55; color: var(--ink); }
+  .card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .card ul li {
+    position: relative; padding-left: 1.15em;
+    font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(16px, 1.12vw, 19px); line-height: 1.48; color: var(--ink);
+  }
+  .card ul li::before { content: '—'; position: absolute; left: 0; opacity: 0.55; }
+  .card .card-sub {
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; font-size: clamp(12.5px, 0.85vw, 14.5px); color: var(--ink); opacity: 0.68; margin-top: 6px;
+  }
+
+  /* ──────────────────────────────────────────────────────────────
+     STAT STRIP — mini multiples of a number + label (+ optional desc)
+     ────────────────────────────────────────────────────────────── */
+  .stat-strip { display: grid; gap: clamp(26px, 3.2vw, 56px); border-top: 1.5px solid var(--ink); padding-top: clamp(20px, 2.2vh, 32px); }
+  .stat-strip.n1 { display: flex; align-items: baseline; gap: clamp(28px, 3.4vw, 50px); }
+  .stat-strip.n3 { grid-template-columns: repeat(3, 1fr); }
+  .stat-strip.n4 { grid-template-columns: repeat(4, 1fr); }
+  .mstat .mnum {
+    font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(56px, min(6.6vw, 11vh), 120px); line-height: 0.95; color: var(--ink); letter-spacing: -0.01em;
+  }
+  .stat-strip.lg .mnum { font-size: clamp(80px, min(9vw, 15vh), 168px); }
+  .mstat .mlab {
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.14em; font-size: clamp(13px, 0.95vw, 15.5px); color: var(--ink); margin-top: 8px;
+  }
+  .mstat .mdesc {
+    font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(14.5px, 1.02vw, 17px);
+    line-height: 1.45; color: var(--ink); margin-top: 8px; max-width: 34ch;
+  }
+
+  /* ──────────────────────────────────────────────────────────────
+     PHOTO GALLERY — bordered placeholder boxes with corner ticks
+     ────────────────────────────────────────────────────────────── */
+  .gallery-grid { display: grid; gap: clamp(24px, 2.8vw, 46px); }
+  .gallery-grid.n2 { grid-template-columns: 1fr 1fr; }
+  .gallery-grid.n3 { grid-template-columns: repeat(3, 1fr); }
+  .pb-wrap { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+  .photobox {
+    position: relative; flex: 1; min-height: clamp(220px, 32vh, 420px);
+    border: 1.5px solid var(--ink); background: var(--paper-2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .photobox::before, .photobox::after { content: ''; position: absolute; width: 16px; height: 16px; border: 1.5px solid var(--ink); }
+  .photobox::before { top: -1.5px; left: -1.5px; border-right: none; border-bottom: none; }
+  .photobox::after { bottom: -1.5px; right: -1.5px; border-left: none; border-top: none; }
+  .photobox .pb-mark {
+    font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(12px, 0.85vw, 14px);
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); opacity: 0.5;
+  }
+  .pb-cap {
+    text-align: center; font-family: 'Hanken Grotesk', sans-serif; font-weight: 600;
+    font-size: clamp(15px, 1.05vw, 18px); color: var(--ink);
+  }
+
+  /* ──────────────────────────────────────────────────────────────
+     STEP FLOW — sequential 3-up process / roadmap
+     ────────────────────────────────────────────────────────────── */
+  .steps-flow { display: grid; gap: clamp(32px, 3.6vw, 60px); }
+  .steps-flow.n3 { grid-template-columns: repeat(3, 1fr); }
+  .step { position: relative; border-top: 1.5px solid var(--ink); padding-top: clamp(18px, 2vh, 28px); min-height: clamp(140px, 16vh, 220px); }
+  .step .step-num { font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(14px, 1vw, 17px); color: var(--ink); letter-spacing: 0.04em; }
+  .step .step-title {
+    margin: 10px 0 12px; font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(28px, 2.3vw, 44px); line-height: 1.15; color: var(--ink);
+  }
+  .step .step-desc { font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(16px, 1.1vw, 19px); line-height: 1.5; color: var(--ink); }
+  .step:not(:last-child)::after {
+    content: '→'; position: absolute; top: clamp(16px, 1.8vh, 24px);
+    right: clamp(-30px, -2vw, -18px);
+    font-family: 'DM Mono', ui-monospace, monospace; font-size: 22px; color: var(--ink); opacity: 0.45;
+  }
+
+  /* ──────────────────────────────────────────────────────────────
+     TAG LIST / TAG STRIP — bullet credential rows, inline keyword chips
+     ────────────────────────────────────────────────────────────── */
+  .taglist { display: flex; flex-direction: column; gap: clamp(14px, 1.7vh, 22px); }
+  .taglist .tagrow {
+    display: flex; gap: 14px; align-items: baseline;
+    font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(17px, 1.2vw, 21px); line-height: 1.42; color: var(--ink);
+  }
+  .taglist .tagrow .tnum { font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(14px, 1vw, 17px); opacity: 0.6; flex: 0 0 auto; }
+  .tagstrip {
+    display: flex; flex-wrap: wrap; column-gap: 0; row-gap: 8px;
+    font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(15px, 1.05vw, 18px); color: var(--ink);
+  }
+  .tagstrip span:not(:last-child)::after { content: ' · '; opacity: 0.5; }
+
+  /* ──────────────────────────────────────────────────────────────
+     1. COVER (reused from Cobalt Grid demo)
+     ────────────────────────────────────────────────────────────── */
+  .s-cover { background: var(--paper); }
+  .s-cover .titlewrap { position: absolute; left: clamp(36px, 3.6vw, 80px); top: clamp(80px, 9vh, 160px); z-index: 5; max-width: 62%; }
+  .s-cover .title {
+    font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(96px, min(11vw, 18vh), 200px); line-height: 0.92; letter-spacing: -0.008em; color: var(--ink);
+  }
+  .s-cover .subkicker { margin-top: clamp(20px, 2.2vh, 36px); display: flex; flex-direction: column; gap: 6px; }
+  .s-cover .subkicker .l {
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.18em; font-size: clamp(15px, 1.15vw, 18px); color: var(--ink);
+  }
+  .s-cover .subkicker .ed { font-family: 'Newsreader', Georgia, serif; font-size: clamp(30px, min(3vw, 5vh), 52px); line-height: 1.16; color: var(--ink); }
+  .s-cover .pixel-glitch { top: clamp(60px, 6vh, 120px); right: clamp(36px, 3.6vw, 80px); width: clamp(240px, 28vw, 480px); bottom: clamp(110px, 12vh, 200px); }
+  .s-cover .qr-block { top: clamp(60px, 6vh, 120px); right: clamp(120px, 8vw, 200px); width: clamp(58px, 4.2vw, 84px); height: clamp(58px, 4.2vw, 84px); }
+  .s-cover .vstack {
+    position: absolute; right: clamp(36px, 3.6vw, 60px); top: 50%; transform: translateY(-50%); z-index: 5;
+    display: flex; flex-direction: column; gap: clamp(10px, 1.2vh, 18px); align-items: end;
+  }
+  .s-cover .vstack .v-row {
+    font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(12px, 0.9vw, 15px); line-height: 1; color: var(--ink);
+    letter-spacing: 0.04em; writing-mode: vertical-rl; text-orientation: mixed;
+  }
+  .s-cover .cfooter {
+    position: absolute; left: clamp(36px, 3.6vw, 80px); right: clamp(600px, 38vw, 820px); bottom: clamp(82px, 8vh, 120px);
+    display: flex; justify-content: flex-start; align-items: end; z-index: 5; gap: clamp(28px, 3vw, 56px);
+  }
+  .s-cover .cfooter .colf { font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(14px, 0.92vw, 15px); line-height: 1.45; color: var(--ink); }
+  .s-cover .cfooter .colf .ftag {
+    font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.18em; font-size: clamp(11px, 0.78vw, 13px); margin-bottom: 4px; color: var(--ink);
+  }
+
+  /* ──────────────────────────────────────────────────────────────
+     2. MANIFESTO (reused — slogan / mission statements, pages 8/17/22 vary)
+     ────────────────────────────────────────────────────────────── */
+  .s-manifesto { background: var(--paper); }
+  .s-manifesto .stmt-wrap { position: absolute; left: clamp(60px, 8vw, 160px); right: clamp(60px, 8vw, 160px); top: 50%; transform: translateY(-50%); z-index: 5; text-align: left; }
+  .s-manifesto .stmt {
+    font-family: 'Newsreader', Georgia, serif; font-weight: 400;
+    font-size: clamp(56px, min(6.4vw, 10.8vh), 116px); line-height: 1.1; letter-spacing: -0.005em; color: var(--ink);
+  }
+  .s-manifesto .attr { margin-top: clamp(32px, 3.4vh, 56px); display: flex; gap: clamp(16px, 1.6vw, 26px); align-items: center; border-top: 1px solid var(--ink); padding-top: clamp(12px, 1.4vh, 20px); }
+  .s-manifesto .attr .who { font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; font-size: clamp(14px, 0.98vw, 16px); color: var(--ink); }
+  .s-manifesto .attr .meta-tag { font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(13px, 0.95vw, 16px); color: var(--ink); letter-spacing: 0.04em; opacity: 0.78; }
+
+  /* ──────────────────────────────────────────────────────────────
+     3. INDEX (reused — 2×3 numbered grid, used for 6 core advantages)
+     ────────────────────────────────────────────────────────────── */
+  .s-index { background: var(--paper); }
+  .s-index .frame { grid-template-rows: auto 1fr; display: grid; }
+  .s-index .list.grid6 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+
+  /* ──────────────────────────────────────────────────────────────
+     4. CHAPTER (reused — nm-tag / title / lede + right glitch column)
+     ────────────────────────────────────────────────────────────── */
+  .s-chapter { background: var(--paper); }
+  .s-chapter .pixel-glitch { top: clamp(60px, 6vh, 120px); right: 0; width: clamp(220px, 26vw, 460px); bottom: clamp(110px, 12vh, 200px); opacity: 0.75; }
+  .s-chapter .frame {
+    inset: auto;
+    position: absolute; left: clamp(36px, 3.6vw, 80px); right: clamp(280px, 30vw, 540px);
+    top: clamp(80px, 9vh, 140px); bottom: clamp(70px, 8vh, 120px);
+    display: flex; flex-direction: column; justify-content: center; z-index: 5; gap: clamp(16px, 1.8vh, 26px);
+  }
+  .s-chapter .nm-tag { font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(14px, 1vw, 17px); color: var(--ink); letter-spacing: 0.06em; }
+  .s-chapter .ttl { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: clamp(52px, min(5.6vw, 9.6vh), 108px); line-height: 1.08; color: var(--ink); letter-spacing: -0.005em; }
+  .s-chapter .lede { font-size: clamp(19px, 1.35vw, 24px); max-width: 56ch; }
+  .s-chapter .taglist { margin-top: clamp(6px, 0.8vh, 12px); }
+
+  /* ──────────────────────────────────────────────────────────────
+     5. DATA (reused — big stat + pixel-bar chart shape not needed here;
+        used in simplified single/double stat form)
+     ────────────────────────────────────────────────────────────── */
+  .s-data { background: var(--paper); }
+
+  /* new: DIRECTION — centred kicker + headline statement + one big stat,
+     built from the shared kicker/headline-stmt/stat-strip primitives.
+     Used for pages 8 and 11 (strategy direction / payout mechanism). */
+  .s-direction { background: var(--paper); }
+  .s-direction .pixel-glitch { top: clamp(40px, 4vh, 80px); right: clamp(36px, 3.6vw, 80px); width: clamp(160px, 16vw, 280px); bottom: clamp(40px, 4vh, 80px); opacity: 0.55; }
+
+  /* ──────────────────────────────────────────────────────────────
+     6. QUOTE (reused — slogan page)
+     ────────────────────────────────────────────────────────────── */
+  .s-quote { background: var(--paper); }
+  .s-quote .pixel-glitch { top: clamp(40px, 4vh, 80px); right: clamp(36px, 3.6vw, 80px); width: clamp(160px, 16vw, 280px); bottom: clamp(40px, 4vh, 80px); opacity: 0.6; }
+  .s-quote .qframe { position: absolute; left: clamp(36px, 3.6vw, 80px); right: clamp(220px, 22vw, 380px); top: 50%; transform: translateY(-50%); z-index: 5; }
+  .s-quote .qkicker { font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; font-size: clamp(14px, 1.05vw, 17px); color: var(--ink); margin-bottom: clamp(18px, 2vh, 32px); }
+  .s-quote .qbody { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: clamp(54px, min(6vw, 10vh), 116px); line-height: 1.1; color: var(--ink); letter-spacing: -0.005em; max-width: 92%; }
+  .s-quote .qattr { margin-top: clamp(28px, 3vh, 46px); display: grid; grid-template-columns: auto 1fr; gap: clamp(16px, 1.6vw, 26px); align-items: end; border-top: 1px solid var(--ink); padding-top: clamp(12px, 1.4vh, 20px); }
+  .s-quote .qattr .who-tag { font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; font-size: clamp(15px, 1.05vw, 18px); color: var(--ink); }
+  .s-quote .qattr .role-meta { font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(13px, 0.95vw, 16px); color: var(--ink); letter-spacing: 0.04em; opacity: 0.78; }
+
+  /* ──────────────────────────────────────────────────────────────
+     7. LEDGER TABLE (reused — adapted to a 4-column revenue table)
+     ────────────────────────────────────────────────────────────── */
+  .s-table { background: var(--paper); }
+  .s-table .ledger { flex: 1; display: flex; flex-direction: column; justify-content: stretch; }
+  .s-table .rowline {
+    display: grid; grid-template-columns: 76px 1fr 2fr 1fr; gap: clamp(14px, 1.4vw, 28px);
+    align-items: center; flex: 1 1 0; min-height: clamp(72px, 9.5vh, 130px);
+    border-bottom: 1px solid rgba(31, 43, 224, 0.18);
+  }
+  .s-table .rowline.headrow { border-bottom: 1.5px solid var(--ink); flex: 0 0 auto; min-height: 0; padding: 8px 0; }
+  .s-table .rowline.headrow > div { font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; font-size: clamp(12px, 0.85vw, 13.5px); color: var(--ink); }
+  .s-table .rowline.total { border-bottom: none; }
+  .s-table .num-tag { font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(14px, 1.05vw, 17px); color: var(--ink); letter-spacing: 0.04em; }
+  .s-table .nm { font-family: 'Newsreader', Georgia, serif; font-size: clamp(30px, 2.3vw, 42px); line-height: 1.15; color: var(--ink); }
+  .s-table .desc { font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(17px, 1.2vw, 20px); line-height: 1.4; color: var(--ink); }
+  .s-table .amt-tag { font-family: 'DM Mono', ui-monospace, monospace; font-size: clamp(28px, 2.3vw, 40px); text-align: right; color: var(--ink); letter-spacing: 0.02em; }
+  .s-table .rowline.total .amt-tag, .s-table .rowline.total .nm { font-weight: 500; }
+
+  /* ──────────────────────────────────────────────────────────────
+     8. COLOPHON (reused — closing slide)
+     ────────────────────────────────────────────────────────────── */
+  .s-colophon { background: var(--paper); }
+  .s-colophon .pixel-glitch { top: clamp(80px, 9vh, 160px); left: clamp(36px, 3.6vw, 80px); width: clamp(220px, 26vw, 460px); bottom: clamp(220px, 22vh, 360px); opacity: 0.75; }
+  .s-colophon .qr-block { top: clamp(80px, 9vh, 160px); right: clamp(36px, 3.6vw, 80px); width: clamp(72px, 5vw, 100px); height: clamp(72px, 5vw, 100px); }
+  .s-colophon .titlewrap { position: absolute; right: clamp(36px, 3.6vw, 80px); top: 26%; z-index: 5; max-width: 58%; text-align: right; }
+  .s-colophon .ktag { font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; font-size: clamp(14px, 1.05vw, 17px); color: var(--ink); margin-bottom: clamp(16px, 1.8vh, 28px); }
+  .s-colophon .ttl { font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: clamp(66px, min(7.8vw, 13vh), 164px); line-height: 1.06; color: var(--ink); letter-spacing: -0.005em; }
+  .s-colophon .col-footer { position: absolute; left: clamp(36px, 3.6vw, 80px); right: clamp(36px, 3.6vw, 80px); bottom: clamp(106px, 10.4vh, 160px); display: grid; grid-template-columns: 1fr 1fr 1fr 1.2fr; gap: clamp(24px, 2.8vw, 48px); z-index: 5; }
+  .s-colophon .col-footer > div { border-top: 1.5px solid var(--ink); padding-top: clamp(12px, 1.4vh, 18px); }
+  .s-colophon .col-footer .ftag { font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; font-size: clamp(12.5px, 0.88vw, 14.5px); margin-bottom: 8px; color: var(--ink); }
+  .s-colophon .col-footer .ftxt { font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(15.5px, 1.05vw, 17.5px); line-height: 1.5; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <div class="stage">
+
+    <!-- 1. 封面 ─────────────────────────────────────────────── -->
+    <section class="slide s-cover hairlines active">
+      <div class="titlewrap">
+        <h1 class="title">露珠</h1>
+        <div class="subkicker">
+          <div class="l">水美好生活创富「心」商业 · 招商事业说明会</div>
+          <div class="ed">一滴好水，<br/>开启美好生活新赛道。</div>
+        </div>
+      </div>
+
+      <div class="pixel-glitch" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="vsCover" width="2.4" height="100" patternUnits="userSpaceOnUse">
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
+            </pattern>
+          </defs>
+          <rect x="36" y="0"  width="38" height="14" fill="url(#vsCover)"/>
+          <rect x="22" y="14" width="50" height="12" fill="url(#vsCover)"/>
+          <rect x="34" y="26" width="46" height="11" fill="url(#vsCover)"/>
+          <rect x="16" y="37" width="60" height="13" fill="url(#vsCover)"/>
+          <rect x="28" y="50" width="48" height="11" fill="url(#vsCover)"/>
+          <rect x="18" y="61" width="62" height="14" fill="url(#vsCover)"/>
+          <rect x="34" y="75" width="44" height="12" fill="url(#vsCover)"/>
+          <rect x="22" y="87" width="50" height="13" fill="url(#vsCover)"/>
+        </svg>
+      </div>
+
+      <div class="qr-block" aria-hidden="true">
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
+        <span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span>
+      </div>
+
+      <div class="vstack">
+        <div class="v-row">国家高新技术企业</div>
+        <div class="v-row">厦门 · 海沧</div>
+        <div class="v-row">2026 事业说明会</div>
+      </div>
+
+      <div class="cfooter">
+        <div class="colf"><div class="ftag">主办</div><div>韩露珠（厦门）环保科技有限公司</div></div>
+        <div class="colf"><div class="ftag">适用场景</div><div>招商事业说明会 · 共建人招募路演</div></div>
+      </div>
+
+      <div class="pagenum">01 / 23</div>
+    </section>
+
+    <!-- 2. 品牌定位与愿景 ───────────────────────────────────── -->
+    <section class="slide s-value hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">品牌定位与愿景</div>
+          <div class="lab-tag">露珠 · 智慧水务数字化平台</div>
+        </div>
+        <p class="lede">以露珠智慧水务数字化平台为流量载体，聚焦净水 / 空气制水 / 智慧水务等高频生活品类，为消费者提供家庭美好生活一站式健康饮水解决方案——覆盖衣食住行、吃喝玩乐全场景。</p>
+        <div class="cards n2">
+          <div class="card">
+            <div class="card-tag">C 端消费者</div>
+            <div class="card-title">省钱不省品质</div>
+            <p class="card-body">年度家庭健康饮水优化方案</p>
+          </div>
+          <div class="card">
+            <div class="card-tag">B 端共建人</div>
+            <div class="card-title">轻投入 · 重运营 · 强复购</div>
+            <p class="card-body">年度 40 万+ 收入模型</p>
+          </div>
+        </div>
+        <p class="note">这不是一次净水设备零售，而是「健康饮水 + 物联网 + 社区服务」的新商业形态。</p>
+      </div>
+      <div class="pagenum">02 / 23</div>
+    </section>
+
+    <!-- 3. 我们是谁 ─────────────────────────────────────────── -->
+    <section class="slide s-entity hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">我们是谁</div>
+          <div class="lab-tag">企业矩阵 · 资质背书</div>
+        </div>
+        <div class="list cols-1">
+          <div class="row">
+            <div class="num-tag">01.</div>
+            <div><h3>韩露珠（厦门）环保科技有限公司</h3><p>国家高新技术企业 · 厦门总部实体运营</p></div>
+          </div>
+          <div class="row">
+            <div class="num-tag">02.</div>
+            <div><h3>露珠水务控股（海南）有限公司</h3><p>控股股东 · 持股 100%</p></div>
+          </div>
+          <div class="row">
+            <div class="num-tag">03.</div>
+            <div><h3>露珠智慧水务数字化服务平台</h3><p>消费转化与共建人运营的流量入口</p></div>
+          </div>
+        </div>
+        <div class="stat-strip n4">
+          <div class="mstat"><div class="mnum">39</div><div class="mlab">项专利</div></div>
+          <div class="mstat"><div class="mnum">16</div><div class="mlab">项商标</div></div>
+          <div class="mstat"><div class="mnum">13</div><div class="mlab">项软件著作权</div></div>
+          <div class="mstat"><div class="mnum">2022</div><div class="mlab">国家高新技术企业认证</div></div>
+        </div>
+      </div>
+      <div class="pagenum">03 / 23</div>
+    </section>
+
+    <!-- 4. 创始人 · 林琦雯 ─────────────────────────────────── -->
+    <section class="slide s-chapter hairlines">
+      <div class="pixel-glitch" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="vsFounder" width="2.4" height="100" patternUnits="userSpaceOnUse">
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
+            </pattern>
+          </defs>
+          <rect x="40" y="0"  width="40" height="14" fill="url(#vsFounder)"/>
+          <rect x="20" y="14" width="56" height="12" fill="url(#vsFounder)"/>
+          <rect x="32" y="26" width="48" height="11" fill="url(#vsFounder)"/>
+          <rect x="14" y="37" width="64" height="13" fill="url(#vsFounder)"/>
+          <rect x="26" y="50" width="50" height="11" fill="url(#vsFounder)"/>
+          <rect x="16" y="61" width="62" height="14" fill="url(#vsFounder)"/>
+          <rect x="32" y="75" width="46" height="12" fill="url(#vsFounder)"/>
+          <rect x="20" y="87" width="54" height="13" fill="url(#vsFounder)"/>
+        </svg>
+      </div>
+      <div class="frame">
+        <div class="nm-tag">企业实力 — 创始人背书</div>
+        <h2 class="ttl">林琦雯 — 用技术与责任，<br/>为共建人托底。</h2>
+        <p class="lede">韩露珠（厦门）环保科技有限公司法定代表人 · 露珠水务控股（海南）有限公司实际控制人 · 露珠智慧水务平台创始人</p>
+        <div class="taglist">
+          <div class="tagrow"><span class="tnum">—</span><span>国家高新技术企业认证（2022 年）</span></div>
+          <div class="tagrow"><span class="tnum">—</span><span>企业知识产权管理体系认证（2024 年）</span></div>
+          <div class="tagrow"><span class="tnum">—</span><span>「一种空气制水机的变频控制系统」发明专利（2025 年）</span></div>
+          <div class="tagrow"><span class="tnum">—</span><span>「一种改进型空气制水机制冷装置」发明专利（2025 年）</span></div>
+          <div class="tagrow"><span class="tnum">—</span><span>抗疫捐赠：厦门大学附属第一医院杏林院区 10 台商用净水设备（2020 年）</span></div>
+        </div>
+      </div>
+      <div class="pagenum">04 / 23</div>
+    </section>
+
+    <!-- 5. 实体场景展示 ─────────────────────────────────────── -->
+    <section class="slide s-gallery hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">实体场景展示</div>
+          <div class="lab-tag">厦门海沧 · 雍厝路 118 号</div>
+        </div>
+        <div class="gallery-grid n3">
+          <div class="pb-wrap"><div class="photobox"><span class="pb-mark">Image Placeholder</span></div><div class="pb-cap">公司总部实景</div></div>
+          <div class="pb-wrap"><div class="photobox"><span class="pb-mark">Image Placeholder</span></div><div class="pb-cap">智慧水务平台运营中心</div></div>
+          <div class="pb-wrap"><div class="photobox"><span class="pb-mark">Image Placeholder</span></div><div class="pb-cap">社区健康水站实景</div></div>
+        </div>
+        <p class="lede">智慧水务平台既是消费场景，也是社区健康水站的运营基地与流量入口。</p>
+      </div>
+      <div class="pagenum">05 / 23</div>
+    </section>
+
+    <!-- 6. 市场痛点 ─────────────────────────────────────────── -->
+    <section class="slide s-pain hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">市场痛点 · 我们解决什么</div>
+          <div class="lab-tag">两类人群 · 一个平台的精准回应</div>
+        </div>
+        <div class="cards n2">
+          <div class="card">
+            <div class="card-tag">消费者</div>
+            <div class="card-sub">痛点</div>
+            <ul>
+              <li>饮水安全焦虑</li>
+              <li>净水设备选择多但决策难</li>
+              <li>社区服务缺位</li>
+            </ul>
+            <div class="card-sub">解法</div>
+            <p class="card-body">智慧水务平台 · 年度家庭健康饮水省钱方案</p>
+          </div>
+          <div class="card">
+            <div class="card-tag">创业者</div>
+            <div class="card-sub">痛点</div>
+            <ul>
+              <li>重资产门槛高</li>
+              <li>流量难获取</li>
+              <li>复购不稳定</li>
+            </ul>
+            <div class="card-sub">解法</div>
+            <p class="card-body">1 万轻投入 · 私域运营闭环 · 40 万+ 收入模型</p>
+          </div>
+        </div>
+        <p class="lede">先讲「为什么有机会」，再讲「为什么是我们」——两端的痛点看似不同，指向的都是同一个平台。</p>
+      </div>
+      <div class="pagenum">06 / 23</div>
+    </section>
+
+    <!-- 7. 侧翼战略 ─────────────────────────────────────────── -->
+    <section class="slide s-chapter hairlines">
+      <div class="pixel-glitch" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="vsFlank" width="2.4" height="100" patternUnits="userSpaceOnUse">
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
+            </pattern>
+          </defs>
+          <rect x="36" y="0"  width="38" height="14" fill="url(#vsFlank)"/>
+          <rect x="22" y="14" width="50" height="12" fill="url(#vsFlank)"/>
+          <rect x="34" y="26" width="46" height="11" fill="url(#vsFlank)"/>
+          <rect x="16" y="37" width="60" height="13" fill="url(#vsFlank)"/>
+          <rect x="28" y="50" width="48" height="11" fill="url(#vsFlank)"/>
+          <rect x="18" y="61" width="62" height="14" fill="url(#vsFlank)"/>
+          <rect x="34" y="75" width="44" height="12" fill="url(#vsFlank)"/>
+          <rect x="22" y="87" width="50" height="13" fill="url(#vsFlank)"/>
+        </svg>
+      </div>
+      <div class="frame">
+        <div class="nm-tag">市场洞察 — 侧翼战略</div>
+        <h2 class="ttl">不在红海硬拼，<br/>开辟水美好生活新蓝海。</h2>
+        <p class="lede">用侧翼选定战略重构新战场——类比军事侧翼战术，避开传统净水设备零售的正面竞争，建立差异化战场。</p>
+        <div class="taglist">
+          <div class="tagrow"><span class="tnum">01</span><span>以智慧水务平台为侧翼流量入口</span></div>
+          <div class="tagrow"><span class="tnum">02</span><span>以社区健康水站为消费转化抓手</span></div>
+          <div class="tagrow"><span class="tnum">03</span><span>以 BOT 模式 + 物联网区块链为财富增长引擎</span></div>
+        </div>
+      </div>
+      <div class="pagenum">07 / 23</div>
+    </section>
+
+    <!-- 8. 战略方向 ─────────────────────────────────────────── -->
+    <section class="slide s-direction hairlines">
+      <div class="frame" style="justify-content:center;">
+        <div class="kicker">战略方向</div>
+        <p class="headline-stmt">构建共建人私域财富流量池——<br/>既独立运营，又合力共生。</p>
+        <div class="stat-strip n1 lg">
+          <div class="mstat">
+            <div class="mnum">40 万+</div>
+          </div>
+          <div class="mstat">
+            <div class="mlab">共建人年度躺赚收入目标</div>
+            <div class="mdesc">私域流量自主可控，总部体系全面赋能</div>
+          </div>
+        </div>
+        <p class="note">「躺赚」不是不干活，而是体系化后的复利增长。</p>
+      </div>
+      <div class="pagenum">08 / 23</div>
+    </section>
+
+    <!-- 9. 共建人运营闭环 ───────────────────────────────────── -->
+    <section class="slide s-loop hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">业绩三级闭环</div>
+          <div class="lab-tag">战略落地</div>
+        </div>
+        <div class="steps-flow n3">
+          <div class="step">
+            <div class="step-num">01 · 引流</div>
+            <div class="step-title">场景化获客</div>
+            <p class="step-desc">社区健康水站体验 / 健康饮水沙龙 / 水质检测服务</p>
+          </div>
+          <div class="step">
+            <div class="step-num">02 · 成交</div>
+            <div class="step-title">复合会员转化</div>
+            <p class="step-desc">10 套复合会员覆盖家庭健康饮水需求</p>
+          </div>
+          <div class="step">
+            <div class="step-num">03 · 升单</div>
+            <div class="step-title">价值升级</div>
+            <p class="step-desc">智慧水务 BOT 会员体系 · 设备升级 + 持续服务</p>
+          </div>
+        </div>
+        <p class="note">每一环都有标准打法，共建人只需按体系执行。</p>
+      </div>
+      <div class="pagenum">09 / 23</div>
+    </section>
+
+    <!-- 10. 增长模型 1+10+1000+N ────────────────────────────── -->
+    <section class="slide s-growth hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">增长模型 · 1 + 10 + 1000 + N</div>
+          <div class="lab-tag">共建人如何实现 40 万+ 年收入</div>
+        </div>
+        <div class="stat-strip n4 lg">
+          <div class="mstat"><div class="mnum">1</div><div class="mlab">共建人</div><div class="mdesc">私域流量池核心</div></div>
+          <div class="mstat"><div class="mnum">10</div><div class="mlab">社区水站站长</div><div class="mdesc">团队裂变节点</div></div>
+          <div class="mstat"><div class="mnum">1000</div><div class="mlab">社区会员名额</div><div class="mdesc">流量基本盘</div></div>
+          <div class="mstat"><div class="mnum">N</div><div class="mlab">口碑转介绍成员</div><div class="mdesc">自然增长因子</div></div>
+        </div>
+        <div class="cards n2">
+          <div class="card">
+            <div class="card-tag">晋升机制</div>
+            <p class="card-body">社区会员转介绍 2 位站长 → 升级为社区水站站长</p>
+          </div>
+          <div class="card">
+            <div class="card-tag">关键问题回应</div>
+            <p class="card-body">谁来卖？社区水站站长 + 总部商学院 · 谁来抓流量？健康水站场景 + 智慧水务平台</p>
+          </div>
+        </div>
+      </div>
+      <div class="pagenum">10 / 23</div>
+    </section>
+
+    <!-- 11. 站长分润机制 ────────────────────────────────────── -->
+    <section class="slide s-direction hairlines">
+      <div class="pixel-glitch" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="vsPayout" width="2.4" height="100" patternUnits="userSpaceOnUse">
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
+            </pattern>
+          </defs>
+          <rect x="20" y="0"  width="50" height="14" fill="url(#vsPayout)"/>
+          <rect x="34" y="14" width="46" height="13" fill="url(#vsPayout)"/>
+          <rect x="14" y="27" width="62" height="14" fill="url(#vsPayout)"/>
+          <rect x="26" y="41" width="50" height="13" fill="url(#vsPayout)"/>
+          <rect x="22" y="54" width="56" height="14" fill="url(#vsPayout)"/>
+          <rect x="36" y="68" width="44" height="13" fill="url(#vsPayout)"/>
+          <rect x="20" y="81" width="60" height="14" fill="url(#vsPayout)"/>
+        </svg>
+      </div>
+      <div class="frame" style="right: clamp(220px, 22vw, 380px); justify-content:center;">
+        <div class="kicker">商业模式 — 分润机制</div>
+        <p class="headline-stmt">构建共建人私域财富流量池——<br/>独立运营，合力共生。</p>
+        <div class="stat-strip n1 lg">
+          <div class="mstat"><div class="mnum">208 元</div></div>
+          <div class="mstat">
+            <div class="mlab">社区水站站长 · 每发展 1 张会员</div>
+            <div class="mdesc">规则透明、计算简单——共建人当场能算清楚自己的收益</div>
+          </div>
+        </div>
+      </div>
+      <div class="pagenum">11 / 23</div>
+    </section>
+
+    <!-- 12. 复合会员分润体系 ────────────────────────────────── -->
+    <section class="slide s-membership hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">复合会员怎么分润？</div>
+          <div class="lab-tag">露珠智慧水务复合会员分润结构</div>
+        </div>
+        <div class="list cols-1">
+          <div class="row"><div class="num-tag">01.</div><div><h3>智能多媒体净饮机设备投放</h3></div></div>
+          <div class="row"><div class="num-tag">02.</div><div><h3>滤芯使用提醒 + 维修服务 + 水质检测</h3></div></div>
+          <div class="row"><div class="num-tag">03.</div><div><h3>终端直饮入户分质供水服务</h3></div></div>
+          <div class="row"><div class="num-tag">04.</div><div><h3>社区健康水站自助服务</h3></div></div>
+        </div>
+        <p class="note">多层分润设计，兼顾直接收益与团队躺赚收益。</p>
+      </div>
+      <div class="pagenum">12 / 23</div>
+    </section>
+
+    <!-- 13. 收入测算 ────────────────────────────────────────── -->
+    <section class="slide s-table hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">共建人年度收入模型</div>
+          <div class="lab-tag">保守测算</div>
+        </div>
+        <div class="ledger">
+          <div class="rowline headrow">
+            <div>No.</div><div>类型</div><div>测算公式</div><div style="text-align:right;">预估金额</div>
+          </div>
+          <div class="rowline">
+            <div class="num-tag">01.</div>
+            <div class="nm">直接收入</div>
+            <div class="desc">100 位社区会员 × 3 次/年 × 350 元/单</div>
+            <div class="amt-tag">10.5 万</div>
+          </div>
+          <div class="rowline">
+            <div class="num-tag">02.</div>
+            <div class="nm">躺赚收入</div>
+            <div class="desc">10 位站长 × 100 位会员 × 3 次/年 × 150 元/单</div>
+            <div class="amt-tag">45 万</div>
+          </div>
+          <div class="rowline total">
+            <div class="num-tag">—</div>
+            <div class="nm">合计</div>
+            <div class="desc">直接做功 + 团队复利，双轮驱动</div>
+            <div class="amt-tag">55.5 万</div>
+          </div>
+        </div>
+        <p class="note">以上为模型测算，非承诺收益。40 万是战略底线目标，模型上限更高。</p>
+      </div>
+      <div class="pagenum">13 / 23</div>
+    </section>
+
+    <!-- 14. 共建人投入与回报 ────────────────────────────────── -->
+    <section class="slide s-invest hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">共建人投入与回报</div>
+          <div class="lab-tag">低门槛 · 快回本</div>
+        </div>
+        <div class="cards n3">
+          <div class="card stat"><div class="card-tag">共建人资格</div><div class="card-title">1 万元</div><p class="card-body">投入门槛</p></div>
+          <div class="card stat"><div class="card-tag">名额限制</div><div class="card-title">30 位</div><p class="card-body">每位共创人仅开放 30 位共建人名额</p></div>
+          <div class="card stat"><div class="card-tag">回本周期</div><div class="card-title">1 个月</div><p class="card-body">可回本，并额外赚取 5,000 元</p></div>
+        </div>
+      </div>
+      <div class="pagenum">14 / 23</div>
+    </section>
+
+    <!-- 15. 共建人三大职责 ──────────────────────────────────── -->
+    <section class="slide s-loop hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">共建人需要做什么？</div>
+          <div class="lab-tag">共建人三大职责</div>
+        </div>
+        <div class="steps-flow n3">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-title">获得身份，快速回本</div>
+            <p class="step-desc">投入 1 万，1 月回本 + 赚 5 千</p>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-title">掌握社区水站运营</div>
+            <p class="step-desc">学习水站搭建与运营，培育站长团队</p>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-title">落实场景获客</div>
+            <p class="step-desc">建立获客场景，跑通个人收入公式</p>
+          </div>
+        </div>
+      </div>
+      <div class="pagenum">15 / 23</div>
+    </section>
+
+    <!-- 16. 共建人行动路线图 ────────────────────────────────── -->
+    <section class="slide s-growth hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">共建人行动路线图</div>
+          <div class="lab-tag">三步走</div>
+        </div>
+        <div class="steps-flow n3">
+          <div class="step">
+            <div class="step-num">Step 1</div>
+            <div class="step-title">加入共建</div>
+            <p class="step-desc">获得身份与权益</p>
+          </div>
+          <div class="step">
+            <div class="step-num">Step 2</div>
+            <div class="step-title">商学院培训</div>
+            <p class="step-desc">掌握产品 / 流量 / 成交方法论</p>
+          </div>
+          <div class="step">
+            <div class="step-num">Step 3</div>
+            <div class="step-title">场景落地</div>
+            <p class="step-desc">社区水站引流 + 站长裂变 + 持续复购</p>
+          </div>
+        </div>
+        <div class="stat-strip n3">
+          <div class="mstat"><div class="mnum">31</div><div class="mlab">位共创人</div></div>
+          <div class="mstat"><div class="mnum">30</div><div class="mlab">位共建人</div></div>
+          <div class="mstat"><div class="mnum">900</div><div class="mlab">位社区水站站长</div></div>
+        </div>
+        <p class="note">2026 年人才孵化目标 — 总部给方法、给工具、给流量支持，共建人专注落地执行。</p>
+      </div>
+      <div class="pagenum">16 / 23</div>
+    </section>
+
+    <!-- 17. 品牌 Slogan ─────────────────────────────────────── -->
+    <section class="slide s-quote hairlines">
+      <div class="pixel-glitch" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="vsSlogan" width="2.4" height="100" patternUnits="userSpaceOnUse">
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
+            </pattern>
+          </defs>
+          <rect x="20" y="0"  width="50" height="14" fill="url(#vsSlogan)"/>
+          <rect x="34" y="14" width="46" height="13" fill="url(#vsSlogan)"/>
+          <rect x="14" y="27" width="62" height="14" fill="url(#vsSlogan)"/>
+          <rect x="26" y="41" width="50" height="13" fill="url(#vsSlogan)"/>
+          <rect x="22" y="54" width="56" height="14" fill="url(#vsSlogan)"/>
+          <rect x="36" y="68" width="44" height="13" fill="url(#vsSlogan)"/>
+          <rect x="20" y="81" width="60" height="14" fill="url(#vsSlogan)"/>
+        </svg>
+      </div>
+      <div class="qframe">
+        <div class="qkicker">品牌 Slogan</div>
+        <p class="qbody">"一滴好水，<br/>开启美好生活新赛道。"</p>
+        <div class="qattr">
+          <div class="who-tag">露珠</div>
+          <div class="role-meta">LUZHU · DEWDROP</div>
+        </div>
+      </div>
+      <div class="pagenum">17 / 23</div>
+    </section>
+
+    <!-- 18. 商学院 · 全面赋能 ───────────────────────────────── -->
+    <section class="slide s-academy hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">商学院 · 全面赋能</div>
+          <div class="lab-tag">露珠专属内部商学院</div>
+        </div>
+        <div class="cards n2">
+          <div class="card">
+            <div class="card-tag">宗旨</div>
+            <p class="card-body">帮助经销商掌握正确方法，提升核心能力，创造超额收益</p>
+          </div>
+          <div class="card">
+            <div class="card-tag">价值观</div>
+            <p class="card-body">不讲有道理的，只讲有用的；不讲好听的，只讲能变现的</p>
+          </div>
+        </div>
+        <div class="tagstrip">
+          <span>市场开拓</span><span>谈判技巧</span><span>销讲招商</span><span>私域运营</span><span>水务知识</span>
+        </div>
+      </div>
+      <div class="pagenum">18 / 23</div>
+    </section>
+
+    <!-- 19. 三大赋能模块 ────────────────────────────────────── -->
+    <section class="slide s-modules hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">商学院三大赋能</div>
+          <div class="lab-tag">招募 · 培训 · 孵化</div>
+        </div>
+        <div class="cards n3">
+          <div class="card">
+            <div class="card-tag">社区水站站长招募</div>
+            <ul>
+              <li>招商讲师驻场支持</li>
+              <li>线下沙龙：每日下午 · 总部会议厅</li>
+              <li>线上直播：每日招商直播</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-tag">系统培训（六大模块）</div>
+            <ul>
+              <li>产品为王 — 净水 / 空气制水技术解读</li>
+              <li>工具赋能 — 智慧水务平台三大工具</li>
+              <li>引爆市场 — 社区健康水站渠道剖析</li>
+              <li>引爆私域 — 朋友圈 / 社群运营策略</li>
+              <li>成交特训 — 心甘情愿成交</li>
+              <li>非买不可 — 绝对成交实战</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-tag">人才孵化</div>
+            <div class="stat-strip n1" style="border-top:none; padding-top:0; flex-direction:column; align-items:flex-start; gap:14px;">
+              <div class="mstat"><div class="mnum" style="font-size:clamp(32px,3vw,52px);">31</div><div class="mlab">位共创人</div></div>
+              <div class="mstat"><div class="mnum" style="font-size:clamp(32px,3vw,52px);">30</div><div class="mlab">位共建人</div></div>
+              <div class="mstat"><div class="mnum" style="font-size:clamp(32px,3vw,52px);">900</div><div class="mlab">位社区水站站长</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pagenum">19 / 23</div>
+    </section>
+
+    <!-- 20. 赋能体系一览 ────────────────────────────────────── -->
+    <section class="slide s-gallery hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">赋能体系一览</div>
+          <div class="lab-tag">总部真的在做事</div>
+        </div>
+        <div class="gallery-grid n2">
+          <div class="pb-wrap"><div class="photobox"><span class="pb-mark">Image Placeholder</span></div><div class="pb-cap">社区水站站长招募现场</div></div>
+          <div class="pb-wrap"><div class="photobox"><span class="pb-mark">Image Placeholder</span></div><div class="pb-cap">系统培训现场</div></div>
+        </div>
+        <p class="lede">用真实培训场景照片增强总部信任感——不是加盟后自生自灭，而是全程陪跑、直到出结果。</p>
+      </div>
+      <div class="pagenum">20 / 23</div>
+    </section>
+
+    <!-- 21. 六大核心优势 ────────────────────────────────────── -->
+    <section class="slide s-index hairlines">
+      <div class="frame">
+        <div class="topbar">
+          <div class="h">6 大核心优势</div>
+          <div class="lab-tag">露珠水美好生活共建事业</div>
+        </div>
+        <div class="list grid6">
+          <div class="row"><div class="num-tag">01.</div><div><h3>强刚需</h3><p>人人需要——净水 / 空气制水 / 智慧水务 · 家庭日常刚需</p></div></div>
+          <div class="row"><div class="num-tag">02.</div><div><h3>高复购</h3><p>持续购买——滤芯更换 + 水务服务 · 自然复购</p></div></div>
+          <div class="row"><div class="num-tag">03.</div><div><h3>轻投入</h3><p>1 万元——低门槛创业 · 当月可赚回 15,450 元</p></div></div>
+          <div class="row"><div class="num-tag">04.</div><div><h3>回本快</h3><p>1–3 月——未回本可安全退出</p></div></div>
+          <div class="row"><div class="num-tag">05.</div><div><h3>不伤客</h3><p>高性价比——健康刚需拦截 · 自驱动口碑</p></div></div>
+          <div class="row"><div class="num-tag">06.</div><div><h3>重扶持</h3><p>全体系——商学院陪跑 · 39 项专利技术背书 · 轻松拿结果</p></div></div>
+        </div>
+      </div>
+      <div class="pagenum">21 / 23</div>
+    </section>
+
+    <!-- 22. 梦想重叠 · 合力共生 ─────────────────────────────── -->
+    <section class="slide s-manifesto hairlines">
+      <div class="stmt-wrap">
+        <p class="stmt">与共建人共享水美好生活的黄金果实——<br/>不是加盟，而是共建；<br/>不是渠道分销商，而是事业合伙人。</p>
+        <div class="attr">
+          <div class="who">露珠 · 共建宣言</div>
+          <div class="meta-tag">梦想重叠 · 合力共生</div>
+        </div>
+      </div>
+      <div class="pagenum">22 / 23</div>
+    </section>
+
+    <!-- 23. 结语 · 合作邀约 ─────────────────────────────────── -->
+    <section class="slide s-colophon hairlines">
+      <div class="pixel-glitch" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="vsClosing" width="2.4" height="100" patternUnits="userSpaceOnUse">
+              <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
+            </pattern>
+          </defs>
+          <rect x="0"  y="0"  width="48" height="13" fill="url(#vsClosing)"/>
+          <rect x="14" y="13" width="56" height="12" fill="url(#vsClosing)"/>
+          <rect x="0"  y="25" width="64" height="14" fill="url(#vsClosing)"/>
+          <rect x="20" y="39" width="50" height="13" fill="url(#vsClosing)"/>
+          <rect x="6"  y="52" width="60" height="14" fill="url(#vsClosing)"/>
+          <rect x="18" y="66" width="48" height="13" fill="url(#vsClosing)"/>
+          <rect x="0"  y="79" width="56" height="14" fill="url(#vsClosing)"/>
+          <rect x="20" y="93" width="44" height="7"  fill="url(#vsClosing)"/>
+        </svg>
+      </div>
+
+      <div class="qr-block" aria-hidden="true">
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
+        <span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span>
+      </div>
+
+      <div class="titlewrap">
+        <div class="ktag">结语 · 合作邀约</div>
+        <h2 class="ttl">携手摘取<br/>水美好生活的<br/>黄金果实。</h2>
+      </div>
+
+      <div class="col-footer">
+        <div><div class="ftag">根基</div><div class="ftxt">以环保科技为根基，重构水美好生活蓝海赛道</div></div>
+        <div><div class="ftag">模式</div><div class="ftxt">以创新商业模式，开启轻创业，共建财富未来</div></div>
+        <div><div class="ftag">邀约</div><div class="ftxt">加入露珠水美好生活共建，共同守护千万家庭的健康饮水生活</div></div>
+        <div><div class="ftag">咨询</div><div class="ftxt">现场咨询招商顾问，详情请联系主办方</div></div>
+      </div>
+
+      <div class="pagenum">23 / 23</div>
+    </section>
+
+  </div>
+</div>
+
+<div class="nav-hint">← / → · space</div>
+
+</body>
+</html>

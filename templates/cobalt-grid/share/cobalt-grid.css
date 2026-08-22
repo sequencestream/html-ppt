@@ -1,0 +1,174 @@
+/* ============================================================
+   Cobalt Grid — shared design-system stylesheet
+   ------------------------------------------------------------
+   The common framework used across Cobalt Grid decks: design
+   tokens, base reset, the fixed full-viewport stage + graph-paper
+   grid backdrop, the slide show/hide mechanism, the type system
+   (display serif / body grotesk / uppercase micro-label / mono),
+   the shared chrome (page number, top+bottom hairlines, nav hint),
+   and the two reusable decorations (pixel-glitch stair, QR-style
+   mini-grid).
+
+   Deck-specific slide layouts (cover, manifesto, index, chapter,
+   data, quote, table, colophon — or any new layout a deck invents)
+   live inline in each deck's own <style> block and build on top of
+   these tokens/primitives, exactly like templates/cobalt-grid/template.html
+   itself does.
+
+   Usage in a deck:
+     <link rel="stylesheet" href="../../templates/cobalt-grid/share/cobalt-grid.css">
+     <script src="../../templates/cobalt-grid/share/cobalt-grid.js"></script>
+     <style> ... deck-specific slide classes ... </style>
+
+   Strictly bichromatic: cream paper (--paper) + one electric cobalt
+   ink (--ink). Never introduce a second colour — reach for --ink-soft
+   or an opacity of --ink instead.
+   ============================================================ */
+
+:root {
+  --paper:    #F0EBDE;   /* warm cream / ivory paper canvas */
+  --paper-2:  #E6E0CE;
+  --ink:      #1F2BE0;   /* electric cobalt / royal blue */
+  --ink-soft: #5560E5;   /* lighter cobalt for secondary marks */
+  --grid:     rgba(31, 43, 224, 0.10);  /* very faint blue grid */
+  --rule:     #1F2BE0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; background: #0a0a0a; }
+body {
+  font-family: 'Hanken Grotesk', 'Helvetica Neue', sans-serif;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+/* Deck wrapper — fills the viewport */
+.deck { position: fixed; inset: 0; display: grid; place-items: center; }
+.stage {
+  position: relative;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+/* Graph-paper grid behind every slide */
+.stage::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: clamp(28px, 2.2vw, 44px) clamp(28px, 2.2vw, 44px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.slide {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 280ms ease;
+  z-index: 2;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ─── TYPE SYSTEM ──────────────────────────────────────────── */
+.disp {
+  font-family: 'Newsreader', Georgia, serif;
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+.body-tx {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.micro {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink);
+}
+.mono {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+/* Single page-number marker, shared across slides.
+   Sits ABOVE the bottom hairline rule, with deliberate space between the
+   two so the chrome elements don't collide on any slide. */
+.pagenum {
+  position: absolute;
+  right: clamp(28px, 2.4vw, 48px);
+  bottom: clamp(48px, 4.8vh, 76px);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: clamp(11px, 0.82vw, 13px);
+  color: var(--ink);
+  letter-spacing: 0.06em;
+  z-index: 9;
+}
+
+/* Top + bottom slim hairlines that frame each slide.
+   The bottom rule is pinned at the slide's lower edge so the page number,
+   which sits above it, has clear space and never overlaps. */
+.hairlines::before,
+.hairlines::after {
+  content: '';
+  position: absolute;
+  left: clamp(36px, 3.6vw, 80px);
+  right: clamp(36px, 3.6vw, 80px);
+  height: 1.5px;
+  background: var(--ink);
+  z-index: 4;
+  pointer-events: none;
+}
+.hairlines::before { top: clamp(28px, 2.6vh, 48px); }
+.hairlines::after  { bottom: clamp(20px, 2vh, 32px); }
+
+/* Fixed nav hint — sits above the bottom hairline, same vertical level
+   as the page number on the opposite side, so neither overlaps the rule. */
+.nav-hint {
+  position: fixed;
+  left: clamp(36px, 3.6vw, 80px);
+  bottom: clamp(48px, 4.8vh, 76px);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: clamp(10px, 0.75vw, 12px);
+  color: var(--ink);
+  letter-spacing: 0.08em;
+  opacity: 0.4;
+  z-index: 12;
+  pointer-events: none;
+}
+
+/* ─── DECORATIVE: pixel-glitch stair (reusable SVG) ─────────── */
+/* Renders a column of stair-stepped rectangles, each filled with vertical
+   scanlines. Decorative only, pointer-events disabled, sits behind content.
+   Each instance should define its own <pattern> with a unique id inside
+   the inline <svg> — see template.html for the per-slide markup pattern. */
+.pixel-glitch {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+}
+.pixel-glitch svg { display: block; width: 100%; height: 100%; }
+
+/* ─── DECORATIVE: small QR-style block ───────────────────────── */
+/* Paper-backgrounded so it reads as a discrete patch when it overlaps the
+   pixel-glitch column behind it. Purely decorative — not a scannable code. */
+.qr-block {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 1.5px;
+  background: var(--paper);
+  padding: 4px;
+  box-shadow: 0 0 0 1.5px var(--paper);
+}
+.qr-block .px { background: var(--paper); }
+.qr-block .px.on { background: var(--ink); }

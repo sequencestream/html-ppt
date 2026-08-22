@@ -1,0 +1,104 @@
+/* ============================================================
+   Cobalt Grid — self-hosted fonts
+   ------------------------------------------------------------
+   Newsreader / Hanken Grotesk / DM Mono, downloaded once from
+   Google Fonts (Latin subset only — the only glyphs the deck's
+   Latin/numeral/punctuation runs need; CJK falls back to the
+   viewer's system serif/sans, exactly as it did against the
+   Google-hosted stylesheet) and served locally.
+
+   Why: fonts.googleapis.com / fonts.gstatic.com are unreachable
+   or unreliable from within mainland China, and third-party
+   "domestic mirrors" (fonts.loli.net and similar) are unofficial,
+   unaffiliated with Google, and can disappear without notice.
+   Self-hosting removes the runtime dependency entirely — the
+   deck renders identically offline, in China, anywhere.
+
+   Newsreader and Hanken Grotesk are variable fonts; each
+   @font-face below pins one static instance off the same file
+   (mirroring how fonts.googleapis.com/css2 itself serves them),
+   so no behaviour changes versus the CDN version.
+
+   Usage in a deck (in place of the Google Fonts <link> tags):
+     <link rel="stylesheet" href="../../templates/cobalt-grid/share/fonts/fonts.css">
+   ============================================================ */
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('newsreader-normal-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('newsreader-normal-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('newsreader-italic-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('newsreader-italic-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('newsreader-italic-var.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('hanken-grotesk-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('hanken-grotesk-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('hanken-grotesk-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('hanken-grotesk-var.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('dm-mono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('dm-mono-500.woff2') format('woff2');
+}
